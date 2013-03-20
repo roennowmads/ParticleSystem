@@ -106,9 +106,9 @@ View.prototype.draw = function () {
     
     mat4.identity(mvMatrix);
 
-    mat4.translate(mvMatrix, [0, 0, -100.5]);
+    mat4.translate(mvMatrix, [0, 0, -3.5]);
     var quatY = quat4.fromAngleAxis(0*Math.PI/2, [1,0,0]);
-	var quatX = quat4.fromAngleAxis(0*this.rotYAngle, [0,0,1]);
+	var quatX = quat4.fromAngleAxis(0*this.rotYAngle, [0,1,0]);
 	var quatRes = quat4.multiply(quatX, quatY);
 	var rotMatrix = quat4.toMat4(quatRes);
 	mat4.multiply(mvMatrix, rotMatrix);
@@ -123,7 +123,7 @@ View.prototype.draw = function () {
     
     //Update positions:
     this.updatePositions(this.gl);
-    
+	
     //Draw on canvas:
     this.drawParticles(this.gl); 
     
@@ -224,13 +224,14 @@ function startTicking() {
 
 View.prototype.drawParticles = function (gl) {
 	this.currentProgram = this.showParticleShader.useProgram(gl);
+	
 	mvPushMatrix();
 	    mat4.translate(mvMatrix, [0, 0, 1]);
 	    
 		this.showParticlesModel.texture = this.texCurrentPos;
 		//gl.activeTexture(gl.TEXTURE0);
 		
-	    this.showParticlesModel.draw(gl);
+	    this.showParticlesModel.draw(gl, this.texVel);
     mvPopMatrix();
 }
 
@@ -335,6 +336,14 @@ View.prototype.setupFBAndInitTextures = function (gl) {
 
 View.prototype.setupShowParticleShader = function (gl) {
 	this.currentProgram = this.showParticleShader.useProgram(gl);
+	
+	gl.activeTexture(gl.TEXTURE0);
+	gl.uniform1i(this.currentProgram.getUniform("posUniform"), 0);
+	
+	gl.activeTexture(gl.TEXTURE1);
+	gl.uniform1i(this.currentProgram.getUniform("velUniform"), 1);
+	
+	gl.activeTexture(gl.TEXTURE0);
 	
 	this.setMVMatrixUniforms(gl);
 	this.setPMatrixUniform(gl);

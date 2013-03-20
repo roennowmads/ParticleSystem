@@ -28,9 +28,9 @@ function main () {
 		var count = document.getElementById("objectCount").value;
 		view.numPointsSqrt = count;
 		view.numPoints = count*count;
-		view.setupFBAndInitTextures(gl);
-		view.setupShowParticleShader (gl);
-		first = true;
+		view.setupFBAndInitTextures(view.gl);
+		view.setupShowParticleShader (view.gl);
+		view.first = true;
 	}
 	
 	//Initialize mouse position to the middle of the canvas:

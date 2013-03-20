@@ -41,7 +41,7 @@ GLShowParticles.prototype.bindBuffers = function (gl) {
 	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("vertexCoordsAttribute"), this.itemSize, gl.FLOAT, false, 0, 0);
 }
 
-GLShowParticles.prototype.draw = function (gl) {
+GLShowParticles.prototype.draw = function (gl, texVel) {
 	//If somehow I could optimize by checking whether all previous changes where done on another program, then i wouldn't have to update.
 	//if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.CANVAS) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
 		this.bindBuffers(gl);
@@ -51,6 +51,11 @@ GLShowParticles.prototype.draw = function (gl) {
 	
 	//Bind texture to read vertex positions from:
 	gl.bindTexture(gl.TEXTURE_2D, this.texture);
+	
+	gl.activeTexture(gl.TEXTURE1);
+	gl.bindTexture(gl.TEXTURE_2D, texVel);
+	
+	gl.activeTexture(gl.TEXTURE0);
 	
 	this.view.setMVMatrixUniforms(gl);
 	gl.drawArrays(gl.POINTS, 0, this.indexNumItems); //will always use texture0

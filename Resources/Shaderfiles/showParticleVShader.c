@@ -5,6 +5,7 @@ varying vec2 vTexCoords;
 varying vec4 vColor;
 
 uniform sampler2D uPos;
+uniform sampler2D uVel;
 
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
@@ -19,5 +20,5 @@ void main() {
 	gl_Position = uPMatrix * uMVMatrix * position;
 
 
-	vColor = gl_Position + 1.0;
+	vColor = texture2D(uVel, aVertexCoords) * 5.0 + 0.5;
 }

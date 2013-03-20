@@ -12,11 +12,11 @@ void main(void) {
 	vec3 current = texture2D(uCurrentVel, vTexCoords).xyz;
 
 	vec3 accelPoint = vec3(texture2D(uCurrentPos, vTexCoords));
-	vec3 deltaDir = vec3((normalize(vec3(uMousePos, 0.0) - accelPoint))) + vec3(cos(gl_FragCoord.y)*7.0, cos(gl_FragCoord.y)*7.0, 0.0)*0.1;
+	vec3 deltaDir = vec3((normalize(vec3(uMousePos, 0.0) - accelPoint))) /*+ vec3(cos(gl_FragCoord.y)*7.0, cos(gl_FragCoord.y)*7.0, 0.0)*0.1*/;
 	if (uMouseDown)
 		deltaDir = -deltaDir*0.25;
 
-	vec3 new = current + deltaDir*.09;
+	vec3 new = current + deltaDir*.04;
 
 	vec3 dir = normalize(new);
 	float len = length(new);
