@@ -33,6 +33,7 @@ function main () {
 		first = true;
 	}
 	
+	//Initialize mouse position to the middle of the canvas:
 	mouseX = canvasElm.width/2;
 	mouseY = canvasElm.height/2;
 	
@@ -66,21 +67,6 @@ function loadShaderScript (object, scriptAddress, fileLoader) {
     request.send();
 }
 
-function FileLoader (fileCount, onCompleteFunction, originClass) {
-	this.fileCount = fileCount;
-	this.filesLoaded = 0;
-	this.onCompleteFunction = onCompleteFunction;
-	this.originClass = originClass;
-}
-
-FileLoader.prototype.count = function () {
-	this.filesLoaded++;
-	if (this.filesLoaded == this.fileCount) {
-		console.log(this)
-		this.onCompleteFunction(this.originClass);
-	}
-}
-
 function onMouseMove(e) {
 	if (mouseOver) {
 		if(e.offsetX == undefined) // this works for Firefox
@@ -98,5 +84,19 @@ function onMouseMove(e) {
 			mouseX = e.offsetX;//clientX;//e.movementX || e.webkitMovementX || e.mozMovementX || 0;
 			mouseY = e.offsetY;//clientY;//e.movementY || e.webkitMovementY || e.mozMovementX || 0;
 		}
+	}
+}
+
+function FileLoader (fileCount, onCompleteFunction, originClass) {
+	this.fileCount = fileCount;
+	this.filesLoaded = 0;
+	this.onCompleteFunction = onCompleteFunction;
+	this.originClass = originClass;
+}
+
+FileLoader.prototype.count = function () {
+	this.filesLoaded++;
+	if (this.filesLoaded == this.fileCount) {
+		this.onCompleteFunction(this.originClass);
 	}
 }

@@ -10,7 +10,7 @@ var time1Sec = 0;
 var fps = 0;
 
 var fragmentScript = null;
-var vertexScript = null;
+//var vertexScript = null;
 
 function logFrameRate() {
 	frames++;

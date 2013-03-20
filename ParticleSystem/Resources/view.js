@@ -72,7 +72,6 @@ View.prototype.initView = function () {
 }
 
 View.prototype.setupShadersAndObjects = function (thisClass) {	
-	console.log(thisClass);
 	thisClass.showParticleShader = new Shader(thisClass.gl, thisClass.showParticleFScriptObj.script, thisClass.showParticleVScriptObj.script);
 	thisClass.initialParticleShader = new Shader(thisClass.gl, thisClass.initialParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
 	thisClass.updateParticleShader = new Shader(thisClass.gl, thisClass.updateParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
