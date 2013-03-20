@@ -1,6 +1,6 @@
 "use strict";
 
-function GLFBParticles (gl, id) {
+function GLFBParticles (gl, id, view) {
 	this.vertexPositionBuffer;
 	this.texCoordsBuffer;
 	this.indexNumItems = 0;
@@ -8,6 +8,7 @@ function GLFBParticles (gl, id) {
 	this.itemSize;
 	this.identifier = id;
 	this.texture;
+	this.view = view;
 }
 
 GLFBParticles.prototype.createQuadAndSetup = function (gl) {
@@ -44,10 +45,10 @@ GLFBParticles.prototype.createQuadAndSetup = function (gl) {
 
 GLFBParticles.prototype.bindBuffers = function (gl) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-	gl.vertexAttribPointer(currentProgram.getAttribute("positionAttribute"), this.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("positionAttribute"), this.itemSize, gl.FLOAT, false, 0, 0);
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordsBuffer);
-	gl.vertexAttribPointer(currentProgram.getAttribute("texCoordsAttribute"), 2, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("texCoordsAttribute"), 2, gl.FLOAT, false, 0, 0);
 }
 
 GLFBParticles.prototype.drawOnFB = function (gl, FBO) {

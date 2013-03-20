@@ -9,7 +9,11 @@ var mouseDown = false;
 
 var Keys = {RIGHT : 39, LEFT : 37, DOWN : 40, UP : 38, SPACE : 32};
 
+var view;
+
 function main () {
+	view = new View();
+
 	document.onmousemove = onMouseMove;
 	
 	var canvasElm = document.getElementById("canvas");
@@ -19,13 +23,13 @@ function main () {
 	canvasElm.onmousedown = function (e) { mouseDown = true; e.preventDefault(); }
 	canvasElm.onmouseup = function () { mouseDown = false; }
 	
-	document.getElementById("objectCount").value = numPointsSqrt; 
+	document.getElementById("objectCount").value = view.numPointsSqrt; 
 	document.getElementById("goButton").onclick = function () {
 		var count = document.getElementById("objectCount").value;
-		numPointsSqrt = count;
-		numPoints = count*count;
-		setupFBAndInitTextures(gl);
-		setupShowParticleShader (gl);
+		view.numPointsSqrt = count;
+		view.numPoints = count*count;
+		view.setupFBAndInitTextures(gl);
+		view.setupShowParticleShader (gl);
 		first = true;
 	}
 	
@@ -35,14 +39,14 @@ function main () {
 	timeLast = Date.now();
 	startTime = Date.now();
 	timeNow = startTime;
-	initView();
+	view.initView();
 }
 
-function loadMesh (model, meshLoc, objectLoader) {
+function loadMesh (gl, model, meshLoc, objectLoader) {
 	model.loadMeshFromCTMFile(meshLoc, gl, objectLoader);
 }
 
-function loadImageToTex (textureObj, imgLoc, objectLoader) {
+function loadImageToTex (gl, textureObj, imgLoc, objectLoader) {
 	var img = new Image();
 	img.src = imgLoc;
 	img.onload = function () {
@@ -62,16 +66,18 @@ function loadShaderScript (object, scriptAddress, fileLoader) {
     request.send();
 }
 
-function FileLoader (fileCount, onCompleteFunction) {
+function FileLoader (fileCount, onCompleteFunction, originClass) {
 	this.fileCount = fileCount;
 	this.filesLoaded = 0;
 	this.onCompleteFunction = onCompleteFunction;
+	this.originClass = originClass;
 }
 
 FileLoader.prototype.count = function () {
 	this.filesLoaded++;
 	if (this.filesLoaded == this.fileCount) {
-		this.onCompleteFunction();
+		console.log(this)
+		this.onCompleteFunction(this.originClass);
 	}
 }
 

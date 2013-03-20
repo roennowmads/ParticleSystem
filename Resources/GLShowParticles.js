@@ -1,28 +1,29 @@
 "use strict";
 
-function GLShowParticles (gl, id) {
+function GLShowParticles (gl, id, view) {
 	this.vertexCoordsBuffer;
 	this.texture;
 	this.indexNumItems = 0;
 	this.identifier;
 	this.itemSize;
 	this.identifier = id;
+	this.view = view;
 }
 
-GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCount, tex) {
+GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCountSqrt, tex) {
 	this.vertexCoordsBuffer = gl.createBuffer();
 	
 	this.itemSize = 2;
-	this.indexNumItems = particleCount;
+	this.indexNumItems = particleCountSqrt*particleCountSqrt;
 	
-	var array = new Array(particleCount*this.itemSize);  
+	var array = new Array(this.indexNumItems*this.itemSize);  
 	var vertexCoords = new Float32Array(array); 
 	array = null;
 	
-	var particleCountSqrt = numPointsSqrt;
+	var particleCountSqrt = particleCountSqrt;
 	
 	//From 1D array to 2D array:
-	for (var i = 0; i<particleCount; i++) {
+	for (var i = 0; i<this.indexNumItems; i++) {
 		var j = i*2;
 		vertexCoords[j] = (j % particleCountSqrt) / particleCountSqrt; //column
 		vertexCoords[j+1] = ((j+1) / particleCountSqrt) / particleCountSqrt; //row
@@ -37,7 +38,7 @@ GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCou
 
 GLShowParticles.prototype.bindBuffers = function (gl) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexCoordsBuffer);
-	gl.vertexAttribPointer(currentProgram.getAttribute("vertexCoordsAttribute"), this.itemSize, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("vertexCoordsAttribute"), this.itemSize, gl.FLOAT, false, 0, 0);
 }
 
 GLShowParticles.prototype.draw = function (gl) {
@@ -51,7 +52,7 @@ GLShowParticles.prototype.draw = function (gl) {
 	//Bind texture to read vertex positions from:
 	gl.bindTexture(gl.TEXTURE_2D, this.texture);
 	
-	setMVMatrixUniforms(gl);
+	this.view.setMVMatrixUniforms(gl);
 	gl.drawArrays(gl.POINTS, 0, this.indexNumItems); //will always use texture0
 	
 	//lastGLObject = this.identifier;

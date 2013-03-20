@@ -1,6 +1,6 @@
 "use strict";
 
-function GLObject (gl) {
+function GLObject (gl, view) {
 	this.vertexPositionBuffer;
 	this.vertexNormalBuffer;
 	this.vertexIndexBuffer;
@@ -8,6 +8,7 @@ function GLObject (gl) {
 	this.indexNumItems = 0;
 	this.identifier;
 	this.texture;
+	this.view = view;
 }
 
 GLObject.prototype.loadMeshFromCTMFile = function (file, gl, fileLoader) {
@@ -75,13 +76,13 @@ GLObject.prototype.bindTexture = function (gl) {
 
 GLObject.prototype.bindBuffers = function (gl) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexTexCoordBuffer);
-	gl.vertexAttribPointer(currentProgram.getAttribute("textureCoordAttribute"), 2, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("textureCoordAttribute"), 2, gl.FLOAT, false, 0, 0);
 		
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-	gl.vertexAttribPointer(currentProgram.getAttribute("vertexPositionAttribute"), 3, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("vertexPositionAttribute"), 3, gl.FLOAT, false, 0, 0);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
-	gl.vertexAttribPointer(currentProgram.getAttribute("vertexNormalAttribute"), 3, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("vertexNormalAttribute"), 3, gl.FLOAT, false, 0, 0);
 
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
 }

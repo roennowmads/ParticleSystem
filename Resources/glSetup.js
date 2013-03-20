@@ -46,18 +46,3 @@ function mvPopMatrix() {
     }
     mvMatrix = mvMatrixStack.pop();
 }
-
-function setPMatrixUniform (gl) {
-	gl.uniformMatrix4fv(currentProgram.getUniform("pMatrixUniform"), false, pMatrix);
-}
-
-function setMVMatrixUniforms (gl) {
-    gl.uniformMatrix4fv(currentProgram.getUniform("mVMatrixUniform"), false, mvMatrix);
-}
-
-function setNormalUniforms (gl) {   
-    var normalMatrix = mat3.create();
-    mat4.toInverseMat3(mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
-    gl.uniformMatrix3fv(currentProgram.getUniform("nMatrixUniform"), false, normalMatrix);
-}

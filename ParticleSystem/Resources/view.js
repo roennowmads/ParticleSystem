@@ -1,127 +1,132 @@
 "use strict";
 
-var canvas;
-var gl;
-var cubeModel, planeModel, FBparticlesModel, showParticlesModel;
-var cubeTex, planeTex;
-var rotYAngle = 0;
+function View () {
+	this.canvas;
+	this.gl;
+	this.cubeModel, this.planeModel, this.FBparticlesModel, this.showParticlesModel;
+	this.cubeTex, this.planeTex;
+	this.rotYAngle = 0;
 
-var showParticleVScriptObj, showParticleFScriptObj;
-var FBTextureVScriptObj;
-var initialParticleFScriptObj;
-var updateParticleFScriptObj;
-var updateVelParticleFScriptObj;
-var updatePosParticleFScriptObj;
+	this.showParticleVScriptObj, this.showParticleFScriptObj;
+	this.FBTextureVScriptObj;
+	this.initialParticleFScriptObj;
+	this.updateParticleFScriptObj;
+	this.pdateVelParticleFScriptObj;
+	this.updatePosParticleFScriptObj;
 
-var phongVScriptObj, phongFScriptObj;
+	this.phongVScriptObj, this.phongFScriptObj;
 
-var currentProgram; 
-var showParticleShader, initialParticleShader, updateParticleShader, updateVelParticleShader, updatePosParticleShader, phongShader;
+	this.currentProgram; 
+	this.showParticleShader, this.initialParticleShader;
+	this.updateParticleShader, this.updateVelParticleShader;
+	this.updatePosParticleShader, this.phongShader;
 
-var DRAWTARGETS = { CANVAS : 0, FRAMEBUFFER : 1 };
+	this.DRAWTARGETS = { CANVAS : 0, FRAMEBUFFER : 1 };
 
-var lastGLObject;
-var lastDrawTarget; 
-var currentTexture;
+	this.lastGLObject;
+	this.lastDrawTarget; 
+	this.currentTexture;
 
-var numPointsSqrt = 800;
-var numPoints = numPointsSqrt*numPointsSqrt;
+	this.numPointsSqrt = 800;
+	this.numPoints = this.numPointsSqrt*this.numPointsSqrt;
 
-var FB;
+	this.FB;
 
-var texPos, texVel;
-var texCurrentPos, texAccel;
+	this.texPos, this.texVel;
+	this.texCurrentPos, this.texAccel;
 
-var zoomFactor = 0.125;
+	this.zoomFactor = 0.125;
+	
+	this.first = true;
+}
 
-function initView () {
-	canvas = document.getElementById("canvas");
-	gl = initGL(canvas);
-	var float_texture_ext = gl.getExtension('OES_texture_float');
+View.prototype.initView = function () {
+	this.canvas = document.getElementById("canvas");
+	this.gl = initGL(this.canvas);
+	var float_texture_ext = this.gl.getExtension('OES_texture_float');
 	if (!float_texture_ext)
 		alert("OES_texture_float extension is not available!");
 	
-	FBTextureVScriptObj = new ScriptObject();
-	initialParticleFScriptObj = new ScriptObject();
-	showParticleVScriptObj = new ScriptObject();
-	showParticleFScriptObj = new ScriptObject();
-	updateParticleFScriptObj = new ScriptObject();
-	updateVelParticleFScriptObj = new ScriptObject();
-	updatePosParticleFScriptObj = new ScriptObject();
+	this.FBTextureVScriptObj = new ScriptObject();
+	this.initialParticleFScriptObj = new ScriptObject();
+	this.showParticleVScriptObj = new ScriptObject();
+	this.showParticleFScriptObj = new ScriptObject();
+	this.updateParticleFScriptObj = new ScriptObject();
+	this.updateVelParticleFScriptObj = new ScriptObject();
+	this.updatePosParticleFScriptObj = new ScriptObject();
 	
-	phongVScriptObj = new ScriptObject();
-	phongFScriptObj = new ScriptObject();
+	this.phongVScriptObj = new ScriptObject();
+	this.phongFScriptObj = new ScriptObject();
 	
 	//Loads shaders, and calls setupShadersAndObjects when done:
-	var objectLoader = new FileLoader(9, setupShadersAndObjects); 
-	loadShaderScript(FBTextureVScriptObj, "Resources/Shaderfiles/FBTextureVShader.c", objectLoader);
-	loadShaderScript(initialParticleFScriptObj, "Resources/Shaderfiles/initialParticleFShader.c", objectLoader);
-	loadShaderScript(showParticleVScriptObj, "Resources/Shaderfiles/showParticleVShader.c", objectLoader);
-	loadShaderScript(showParticleFScriptObj, "Resources/Shaderfiles/showParticleFShader.c", objectLoader);
-	loadShaderScript(updateParticleFScriptObj, "Resources/Shaderfiles/updateParticleFShader.c", objectLoader);
-	loadShaderScript(updateVelParticleFScriptObj, "Resources/Shaderfiles/updateVelParticleFShader.c", objectLoader);
-	loadShaderScript(updatePosParticleFScriptObj, "Resources/Shaderfiles/updatePosParticleFShader.c", objectLoader);
-	loadShaderScript(phongVScriptObj, "Resources/Shaderfiles/phongVShader.c", objectLoader);
-	loadShaderScript(phongFScriptObj, "Resources/Shaderfiles/phongFShader.c", objectLoader);
+	var objectLoader = new FileLoader(9, this.setupShadersAndObjects, this); 
+	loadShaderScript(this.FBTextureVScriptObj, "Resources/Shaderfiles/FBTextureVShader.c", objectLoader);
+	loadShaderScript(this.initialParticleFScriptObj, "Resources/Shaderfiles/initialParticleFShader.c", objectLoader);
+	loadShaderScript(this.showParticleVScriptObj, "Resources/Shaderfiles/showParticleVShader.c", objectLoader);
+	loadShaderScript(this.showParticleFScriptObj, "Resources/Shaderfiles/showParticleFShader.c", objectLoader);
+	loadShaderScript(this.updateParticleFScriptObj, "Resources/Shaderfiles/updateParticleFShader.c", objectLoader);
+	loadShaderScript(this.updateVelParticleFScriptObj, "Resources/Shaderfiles/updateVelParticleFShader.c", objectLoader);
+	loadShaderScript(this.updatePosParticleFScriptObj, "Resources/Shaderfiles/updatePosParticleFShader.c", objectLoader);
+	loadShaderScript(this.phongVScriptObj, "Resources/Shaderfiles/phongVShader.c", objectLoader);
+	loadShaderScript(this.phongFScriptObj, "Resources/Shaderfiles/phongFShader.c", objectLoader);
 }
 
-function setupShadersAndObjects() {		
-	showParticleShader = new Shader(gl, showParticleFScriptObj.script, showParticleVScriptObj.script);
-	initialParticleShader = new Shader(gl, initialParticleFScriptObj.script, FBTextureVScriptObj.script);
-	updateParticleShader = new Shader(gl, updateParticleFScriptObj.script, FBTextureVScriptObj.script);
-	updateVelParticleShader = new Shader(gl, updateVelParticleFScriptObj.script, FBTextureVScriptObj.script);
-	updatePosParticleShader = new Shader(gl, updatePosParticleFScriptObj.script, FBTextureVScriptObj.script);
-	phongShader = new Shader(gl, phongFScriptObj.script, phongVScriptObj.script);
+View.prototype.setupShadersAndObjects = function (thisClass) {	
+	console.log(thisClass);
+	thisClass.showParticleShader = new Shader(thisClass.gl, thisClass.showParticleFScriptObj.script, thisClass.showParticleVScriptObj.script);
+	thisClass.initialParticleShader = new Shader(thisClass.gl, thisClass.initialParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
+	thisClass.updateParticleShader = new Shader(thisClass.gl, thisClass.updateParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
+	thisClass.updateVelParticleShader = new Shader(thisClass.gl, thisClass.updateVelParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
+	thisClass.updatePosParticleShader = new Shader(thisClass.gl, thisClass.updatePosParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
+	thisClass.phongShader = new Shader(thisClass.gl, thisClass.phongFScriptObj.script, thisClass.phongVScriptObj.script);
 	
-	setupCanvas(gl);
+	thisClass.setupCanvas(thisClass.gl);
 	
 	//setupParticleShader(gl, updateParticleShader);
-	setupUpdateVelShader(gl);
-	setupUpdatePosShader(gl);
-	setupFBAndInitTextures(gl);
-	setupShowParticleShader(gl);
-	setupPhongShader(gl);
+	thisClass.setupUpdateVelShader(thisClass.gl);
+	thisClass.setupUpdatePosShader(thisClass.gl);
+	thisClass.setupFBAndInitTextures(thisClass.gl);
+	thisClass.setupShowParticleShader(thisClass.gl);
+	thisClass.setupPhongShader(thisClass.gl);
 	
 	//startTicking();
 }
 
-function animate () {
+View.prototype.animate = function () {
 	timeNow = Date.now();
 	var elapsed = timeNow - timeLast;
     var delta = 0.001 * elapsed;
-	rotYAngle += delta;
+	this.rotYAngle += delta;
 		
 	timeLast = timeNow;
 }
 
-var first = true;
-
-function draw () {
+View.prototype.draw = function () {
 	//Clear the screen:
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     
     mat4.identity(mvMatrix);
 
     mat4.translate(mvMatrix, [0, 0, -100.5]);
     var quatY = quat4.fromAngleAxis(0*Math.PI/2, [1,0,0]);
-	var quatX = quat4.fromAngleAxis(0*rotYAngle, [0,0,1]);
+	var quatX = quat4.fromAngleAxis(0*this.rotYAngle, [0,0,1]);
 	var quatRes = quat4.multiply(quatX, quatY);
 	var rotMatrix = quat4.toMat4(quatRes);
 	mat4.multiply(mvMatrix, rotMatrix);
     
-    if (first) 
-    	drawInitialTextures(gl);
+    if (this.first) 
+    	this.drawInitialTextures(this.gl);
     
     var elapsedFromStart = (timeNow - startTime)*0.001;
     
     //Update velocities:
-    updateVelocities(gl);
+    this.updateVelocities(this.gl);
     
     //Update positions:
-    updatePositions(gl);
+    this.updatePositions(this.gl);
     
     //Draw on canvas:
-    drawParticles(gl); 
+    this.drawParticles(this.gl); 
     
     //mat4.translate(mvMatrix, [0, 10, -10]);
     //drawParticles(gl); 
@@ -194,7 +199,7 @@ function draw () {
    
 }
 
-function setupCanvas (gl) {
+View.prototype.setupCanvas = function (gl) {
 	gl.clearColor(0.1, 0.1, 0.2, 1.0);
 	//gl.enable(gl.DEPTH_TEST);
 	//gl.enable(gl.BLEND);
@@ -207,9 +212,9 @@ function setupCanvas (gl) {
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 }
 
-function tick() {
-	draw();
-	animate();
+function tick () {
+	view.draw();
+	view.animate();
 	logFrameRate();
 	requestAnimFrame(tick);
 }
@@ -218,138 +223,153 @@ function startTicking() {
 	tick();
 }
 
-function drawParticles (gl) {
-	currentProgram = showParticleShader.useProgram(gl);
+View.prototype.drawParticles = function (gl) {
+	this.currentProgram = this.showParticleShader.useProgram(gl);
 	mvPushMatrix();
 	    mat4.translate(mvMatrix, [0, 0, 1]);
 	    
-		showParticlesModel.texture = texCurrentPos;
+		this.showParticlesModel.texture = this.texCurrentPos;
 		//gl.activeTexture(gl.TEXTURE0);
 		
-	    showParticlesModel.draw(gl);
+	    this.showParticlesModel.draw(gl);
     mvPopMatrix();
 }
 
-function updateVelocities (gl) {
-	currentProgram = updateVelParticleShader.useProgram(gl);
+View.prototype.updateVelocities = function (gl) {
+	this.currentProgram = this.updateVelParticleShader.useProgram(gl);
     
     //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
-    gl.uniform2f(currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/mouseX*2.1/gl.viewportWidth - 0.55, 1 - mouseY*1.5/gl.viewportHeight + 0.25 /*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
-    gl.uniform1i(currentProgram.getUniform("mouseDownUniform"), mouseDown);  
+    gl.uniform2f(this.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/mouseX*2.1/gl.viewportWidth - 0.55, 1 - mouseY*1.5/gl.viewportHeight + 0.25 /*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
+    gl.uniform1i(this.currentProgram.getUniform("mouseDownUniform"), mouseDown);  
     
-    FB.bindFBAndAttachTex(gl, texVel, FB.FB);
-    FBparticlesModel.drawOnFBMulti(gl, FB, texVel, texCurrentPos);
+    this.FB.bindFBAndAttachTex(gl, this.texVel, this.FB.FB);
+    this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texVel, this.texCurrentPos);
 }
 
-function updatePositions (gl) {
-	currentProgram = updatePosParticleShader.useProgram(gl);
+View.prototype.updatePositions = function (gl) {
+	this.currentProgram = this.updatePosParticleShader.useProgram(gl);
     
     //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
 	
-    FB.bindFBAndAttachTex(gl, texCurrentPos, FB.FB);
-    FBparticlesModel.drawOnFBMulti(gl, FB, texCurrentPos, texVel);
+    this.FB.bindFBAndAttachTex(gl, this.texCurrentPos, this.FB.FB);
+    this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texCurrentPos, this.texVel);
 }
 
-function drawInitialTextures (gl) {
-	currentProgram = initialParticleShader.useProgram(gl);
+View.prototype.drawInitialTextures = function (gl) {
+	this.currentProgram = this.initialParticleShader.useProgram(gl);
 	
 	//Initialize position texture:
 	var elapsedFromStart = (timeNow - startTime)*0.001;
-	gl.uniform2f(currentProgram.getUniform("offsetUniform"), -0.5, 0.5);
-	gl.uniform1f(currentProgram.getUniform("multiplierUniform"), 0.1);
-	gl.uniform1f(currentProgram.getUniform("correctionUniform"), 0.45);
+	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -0.5, 0.5);
+	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 0.1);
+	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	FB.bindFBAndAttachTex(gl, texCurrentPos, FB.FB);
+	this.FB.bindFBAndAttachTex(gl, this.texCurrentPos, this.FB.FB);
 	
-	FBparticlesModel.drawOnFB(gl, FB);
+	this.FBparticlesModel.drawOnFB(gl, this.FB);
 	
 	///
 
 	//Initialize velocity texture:
-	gl.uniform2f(currentProgram.getUniform("offsetUniform"), -.5 , -0.5);
-	gl.uniform1f(currentProgram.getUniform("multiplierUniform"), 0.1);
-	gl.uniform1f(currentProgram.getUniform("correctionUniform"), 0.45);
+	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -.5 , -0.5);
+	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 0.1);
+	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
 	
 	gl.activeTexture(gl.TEXTURE1);
-	FB.bindFBAndAttachTex(gl, texVel, FB.FB);
+	this.FB.bindFBAndAttachTex(gl, this.texVel, this.FB.FB);
 
-	FBparticlesModel.drawOnFB(gl, FB);
+	this.FBparticlesModel.drawOnFB(gl, this.FB);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	first = false;
+	this.first = false;
 }
 
-function setupUpdatePosShader (gl) {
-	currentProgram = updatePosParticleShader.useProgram(gl);
+View.prototype.setupUpdatePosShader = function (gl) {
+	this.currentProgram = this.updatePosParticleShader.useProgram(gl);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	gl.uniform1i(currentProgram.getUniform("currentPosUniform"), 0);
+	gl.uniform1i(this.currentProgram.getUniform("currentPosUniform"), 0);
 	
 	gl.activeTexture(gl.TEXTURE1);
-	gl.uniform1i(currentProgram.getUniform("currentVelUniform"), 1);
+	gl.uniform1i(this.currentProgram.getUniform("currentVelUniform"), 1);
 	
 	gl.activeTexture(gl.TEXTURE0);
 }
 
-function setupUpdateVelShader (gl) {
-	currentProgram = updateVelParticleShader.useProgram(gl);
+View.prototype.setupUpdateVelShader = function (gl) {
+	this.currentProgram = this.updateVelParticleShader.useProgram(gl);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	gl.uniform1i(currentProgram.getUniform("currentVelUniform"), 0);
+	gl.uniform1i(this.currentProgram.getUniform("currentVelUniform"), 0);
 	
 	gl.activeTexture(gl.TEXTURE1);
-	gl.uniform1i(currentProgram.getUniform("currentPosUniform"), 1);
+	gl.uniform1i(this.currentProgram.getUniform("currentPosUniform"), 1);
 	
 	gl.activeTexture(gl.TEXTURE0);
 }
 
 function setupParticleShader (gl, shaderProgram) {
-	currentProgram = shaderProgram.useProgram(gl);
+	this.currentProgram = shaderProgram.useProgram(gl);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	gl.uniform1i(currentProgram.getUniform("currentUniform"), 0);
+	gl.uniform1i(this.currentProgram.getUniform("currentUniform"), 0);
 	
 	gl.activeTexture(gl.TEXTURE1);
-	gl.uniform1i(currentProgram.getUniform("deltaUniform"), 1);
+	gl.uniform1i(this.currentProgram.getUniform("deltaUniform"), 1);
 	
 	gl.activeTexture(gl.TEXTURE0);
 }
 
-function setupFBAndInitTextures (gl) {
-	FBparticlesModel = new GLFBParticles(gl, 1);
-	FBparticlesModel.createQuadAndSetup(gl);
+View.prototype.setupFBAndInitTextures = function (gl) {
+	this.FBparticlesModel = new GLFBParticles(gl, 1, this);
+	this.FBparticlesModel.createQuadAndSetup(gl);
 	
-	FB = new FBO(gl, numPointsSqrt);
+	this.FB = new FBO(gl, this.numPointsSqrt);
 	gl.activeTexture(gl.TEXTURE1);
-	texVel = createAndSetupTexture(gl, FB.widthFB, FB.heightFB);
+	this.texVel = createAndSetupTexture(gl, this.FB.widthFB, this.FB.heightFB);
 	gl.activeTexture(gl.TEXTURE0);
-	texCurrentPos = createAndSetupTexture(gl, FB.widthFB, FB.heightFB);
+	this.texCurrentPos = createAndSetupTexture(gl, this.FB.widthFB, this.FB.heightFB);
 	
 	gl.activeTexture(gl.TEXTURE0);
 }
 
-function setupShowParticleShader (gl) {
-	currentProgram = showParticleShader.useProgram(gl);
+View.prototype.setupShowParticleShader = function (gl) {
+	this.currentProgram = this.showParticleShader.useProgram(gl);
 	
-	setMVMatrixUniforms(gl);
-	setPMatrixUniform(gl);
+	this.setMVMatrixUniforms(gl);
+	this.setPMatrixUniform(gl);
 	
-	showParticlesModel = new GLShowParticles(gl, 2);
-	showParticlesModel.generateParticlesAndBuffer(gl, numPoints, texPos);
+	this.showParticlesModel = new GLShowParticles(gl, 2, this);
+	this.showParticlesModel.generateParticlesAndBuffer(gl, this.numPointsSqrt, this.texPos);
 }
 
-function setupPhongShader (gl) {
-	currentProgram = phongShader.useProgram(gl);
-	gl.uniform3f(currentProgram.getUniform("lightingPositionUniform"), 0, 0, 0);
-	setMVMatrixUniforms(gl);
-	setPMatrixUniform(gl);
-	setNormalUniforms(gl); 
+View.prototype.setupPhongShader = function (gl) {
+	this.currentProgram = this.phongShader.useProgram(gl);
+	gl.uniform3f(this.currentProgram.getUniform("lightingPositionUniform"), 0, 0, 0);
+	this.setMVMatrixUniforms(gl);
+	this.setPMatrixUniform(gl);
+	this.setNormalUniforms(gl); 
 	
-	cubeModel = new GLObject(gl);
-	cubeTex = new Texture();
+	this.cubeModel = new GLObject(gl, this);
+	this.cubeTex = new Texture();
 	
-	var objectLoader = new FileLoader(2, startTicking); 
-	loadImageToTex(cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/red.png", objectLoader);
-	loadMesh(cubeModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
+	var objectLoader = new FileLoader(2, startTicking, this); 
+	loadImageToTex(gl, this.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/red.png", objectLoader);
+	loadMesh(gl, this.cubeModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
+}
+
+View.prototype.setPMatrixUniform = function (gl) {
+	gl.uniformMatrix4fv(this.currentProgram.getUniform("pMatrixUniform"), false, pMatrix);
+}
+
+View.prototype.setMVMatrixUniforms = function (gl) {
+    gl.uniformMatrix4fv(this.currentProgram.getUniform("mVMatrixUniform"), false, mvMatrix);
+}
+
+View.prototype.setNormalUniforms = function (gl) {   
+    var normalMatrix = mat3.create();
+    mat4.toInverseMat3(mvMatrix, normalMatrix);
+    mat3.transpose(normalMatrix);
+    gl.uniformMatrix3fv(this.currentProgram.getUniform("nMatrixUniform"), false, normalMatrix);
 }
