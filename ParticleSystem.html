@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	
+	<title>Particle System</title>
+    
+    <style type="text/css">
+    		
+		body, table td, select, button {
+  			font-family: Arial Unicode MS, Arial, sans-serif;
+  			font-size: small;
+		}
+		pre {
+  			font-family: "courier new", courier;
+  			font-size: small;
+		}
+		body {
+  			color: black;
+  			margin: 10px;
+  			border: 0px;
+  			padding: 0px;
+  			background: #fff;
+  			direction: ltr;
+		}
+		a, a:visited {
+  			color: #0066cc;
+  			text-decoration:none;
+		}
+		a:hover {
+  			color: #0066cc;
+  			text-decoration:underline;
+		}
+
+		select {
+  			background: white;
+		}
+		
+		#FPS {
+			text-align:center; 
+			background: rgb(220,220,240); 
+			padding: 1em;
+			border: 1px solid rgb(180,180,200);
+		}
+		
+		.sidebar {
+			background: rgb(220,220,240);
+			width:250px; 
+			margin-top: 5px;
+			border: 1px solid rgb(180,180,200);
+		}
+		#canvas {
+			float:left; 
+			border: 1px solid rgb(180,180,200); 
+			position: relative; 
+			top: 5px; 
+			left: 5px;
+		}
+		
+    </style>
+    <script type="text/javascript" language="javascript" src="Resources/libs/webgl-debug.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/libs/webgl-utils.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/libs/gl-matrix.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/libs/ctm.js"></script> <!-- Only load as long as not using Worker -->
+    <script type="text/javascript" language="javascript" src="Resources/libs/lzma.js"></script> <!-- Only load as long as not using Worker -->
+    <script type="text/javascript" language="javascript" src="Resources/glSetup.js"></script>    
+    <script type="text/javascript" language="javascript" src="Resources/Shader.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/FBO.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/GLObject.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/GLPlane.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/GLSimpleParticles.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/GLShowParticles.js"></script>
+    <script type="text/javascript" language="javascript" src="Resources/GLFBParticles.js"></script>
+    <script type="text/javascript" language="javascript" src="ParticleSystem/Resources/view.js"></script>
+    <script type="text/javascript" language="javascript" src="ParticleSystem/Resources/model.js"></script>
+    <!--script type="text/javascript" language="javascript" src="Resources/quatFun.js"></script-->
+  </head>
+
+  <body onload="main()">
+    <h3 id="FPS" style="margin: 0;">Framerate:</h3>
+    <div style="float:left;">
+    	<div class="sidebar">	
+    		<h2>Instructions:</h2>
+			<p>Move mouse pointer around the canvas to move the point of gravity</p>
+			<p>Hold down a mouse button to switch to anti-gravity</p>
+			<div style="padding-bottom: 10px;">
+			</div>
+		</div>
+		<div class="sidebar">	
+    		<h2>Options:</h2>
+			<label for="objectCount">The square root of the number of particles:</label>
+			<input style="text-align:right; width:70px" type="text" id="objectCount" value="800" maxlength="10" />
+			<button id="goButton">Go</button>
+			<div style="padding-bottom: 10px;">
+			</div>
+		</div>
+    </div>
+    </div>
+    <div>
+    	<canvas id="canvas" width="1000" height="700"></canvas>
+	</div>
+	<div style='position:relative;'>
+		<p id="sourceLink"></p>
+	</div>
+  </body>
+</html>

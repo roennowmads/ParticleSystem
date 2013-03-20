@@ -1,0 +1,96 @@
+"use strict";
+var timeLast;
+var startTime;
+var timeNow;
+
+var mouseX = 0, mouseY = 0;
+var mouseOver = false;
+var mouseDown = false;
+
+var Keys = {RIGHT : 39, LEFT : 37, DOWN : 40, UP : 38, SPACE : 32};
+
+function main () {
+	document.onmousemove = onMouseMove;
+	
+	var canvasElm = document.getElementById("canvas");
+	
+	canvasElm.onmouseover = function () { mouseOver = true; }
+	canvasElm.onmouseout = function () { mouseOver = false; }
+	canvasElm.onmousedown = function (e) { mouseDown = true; e.preventDefault(); }
+	canvasElm.onmouseup = function () { mouseDown = false; }
+	
+	document.getElementById("objectCount").value = numPointsSqrt; 
+	document.getElementById("goButton").onclick = function () {
+		var count = document.getElementById("objectCount").value;
+		numPointsSqrt = count;
+		numPoints = count*count;
+		setupFBAndInitTextures(gl);
+		setupShowParticleShader (gl);
+		first = true;
+	}
+	
+	mouseX = canvasElm.width/2;
+	mouseY = canvasElm.height/2;
+	
+	timeLast = Date.now();
+	startTime = Date.now();
+	timeNow = startTime;
+	initView();
+}
+
+function loadMesh (model, meshLoc, objectLoader) {
+	model.loadMeshFromCTMFile(meshLoc, gl, objectLoader);
+}
+
+function loadImageToTex (textureObj, imgLoc, objectLoader) {
+	var img = new Image();
+	img.src = imgLoc;
+	img.onload = function () {
+		textureObj.texture = new createTexture(img, gl, objectLoader);
+	}
+}
+
+function loadShaderScript (object, scriptAddress, fileLoader) {
+	var request = new XMLHttpRequest();
+    request.onreadystatechange = function () { 
+    	if (request.readyState == 4) { 
+    		object.script = request.responseText;
+    		fileLoader.count();
+		}
+	}
+	request.open("GET", scriptAddress, true);
+    request.send();
+}
+
+function FileLoader (fileCount, onCompleteFunction) {
+	this.fileCount = fileCount;
+	this.filesLoaded = 0;
+	this.onCompleteFunction = onCompleteFunction;
+}
+
+FileLoader.prototype.count = function () {
+	this.filesLoaded++;
+	if (this.filesLoaded == this.fileCount) {
+		this.onCompleteFunction();
+	}
+}
+
+function onMouseMove(e) {
+	if (mouseOver) {
+		if(e.offsetX == undefined) // this works for Firefox
+		{
+			if (document.getElementById("canvas").offsetLeft == 0) {
+				mouseX = e.pageX - 267;
+				mouseY = e.pageY - 66;
+			}
+			else {
+				mouseX = e.pageX - document.getElementById("canvas").offsetLeft;
+				mouseY = e.pageY - document.getElementById("canvas").offsetTop;
+			}
+		}
+		else {
+			mouseX = e.offsetX;//clientX;//e.movementX || e.webkitMovementX || e.mozMovementX || 0;
+			mouseY = e.offsetY;//clientY;//e.movementY || e.webkitMovementY || e.mozMovementX || 0;
+		}
+	}
+}
