@@ -71,7 +71,7 @@ GLObject.prototype.bindTexture = function (gl) {
 	//gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.texture);
 	//gl.uniform1i(currentProgram.getUniform("samplerUniform"), 0);
-	currentTexture = this.texture;
+	this.view.currentTexture = this.texture;
 }
 
 GLObject.prototype.bindBuffers = function (gl) {
@@ -88,17 +88,20 @@ GLObject.prototype.bindBuffers = function (gl) {
 }
 
 GLObject.prototype.draw = function (gl) {	
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+	
 	//if (currentTexture != this.texture)		//Optimizes by not binding the texture, if the same texture is already bound.
 		this.bindTexture(gl);
 	
 	//if (this.identifier != lastGLObject) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
 		this.bindBuffers(gl);
 		
-	setNormalUniforms(gl); 
-	setMVMatrixUniforms(gl);
+	this.view.setNormalUniforms(gl); 
+	this.view.setMVMatrixUniforms(gl);
 	gl.drawElements(gl.TRIANGLES, this.indexNumItems, gl.UNSIGNED_SHORT, 0);
 	
-	lastGLObject = this.identifier;
+	this.view.lastGLObject = this.identifier;
 }
 
 //Helper functions:
@@ -115,6 +118,8 @@ function createTexture (img, gl, fileLoader) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	//gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	//gl.generateMipmap(gl.TEXTURE_2D);
 	gl.bindTexture(gl.TEXTURE_2D, null);
 	

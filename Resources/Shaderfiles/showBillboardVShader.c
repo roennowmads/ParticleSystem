@@ -1,9 +1,9 @@
 attribute vec2 aVertexCoords;
 
-varying vec4 vColor;
+varying vec2 vTexCoords;
 
 uniform sampler2D uPos;
-uniform sampler2D uVel;
+uniform sampler2D uBill;
 
 uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
@@ -15,6 +15,7 @@ void main() {
 	gl_PointSize = 1.0;
 	gl_Position = uPMatrix * uMVMatrix * position;
 
+	//vec4 a = texture2D(uBill, vec2(0.0,0.0));
 
-	vColor = texture2D(uVel, aVertexCoords) * 5.0 + 0.5;
+	vTexCoords = vec2(position.xy + 0.5);
 }

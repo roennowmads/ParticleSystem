@@ -2,7 +2,7 @@
 
 function GLShowParticles (gl, id, view) {
 	this.vertexCoordsBuffer;
-	this.texture;
+	this.posTex;
 	this.indexNumItems = 0;
 	this.identifier;
 	this.itemSize;
@@ -33,12 +33,32 @@ GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCou
 	gl.bufferData(gl.ARRAY_BUFFER, vertexCoords, gl.STATIC_DRAW);
 	
 	vertexCoords = null;
-	this.texture = tex;
+	this.posTex = tex;
 }
 
 GLShowParticles.prototype.bindBuffers = function (gl) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexCoordsBuffer);
 	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("vertexCoordsAttribute"), this.itemSize, gl.FLOAT, false, 0, 0);
+}
+
+GLShowParticles.prototype.drawBillboards = function (gl, billboardTex) {
+	//if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.CANVAS) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
+		this.bindBuffers(gl);
+
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+	
+	//Bind texture to read vertex positions from:
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.posTex);
+	
+	gl.activeTexture(gl.TEXTURE2);
+	gl.bindTexture(gl.TEXTURE_2D, billboardTex);
+	
+	gl.activeTexture(gl.TEXTURE0);
+	
+	this.view.setMVMatrixUniforms(gl);
+	gl.drawArrays(gl.POINTS, 0, this.indexNumItems)
 }
 
 GLShowParticles.prototype.draw = function (gl, texVel) {
@@ -50,7 +70,8 @@ GLShowParticles.prototype.draw = function (gl, texVel) {
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	
 	//Bind texture to read vertex positions from:
-	gl.bindTexture(gl.TEXTURE_2D, this.texture);
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, this.posTex);
 	
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, texVel);

@@ -29,7 +29,7 @@ function main () {
 		view.numPointsSqrt = count;
 		view.numPoints = count*count;
 		view.setupFBAndInitTextures(view.gl);
-		view.setupShowParticleShader (view.gl);
+		view.setupShowBillboardShader (view.gl);
 		view.first = true;
 	}
 	
