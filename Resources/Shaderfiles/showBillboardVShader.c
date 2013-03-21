@@ -1,6 +1,6 @@
-attribute vec2 aVertexCoords;
+precision lowp float;
 
-varying vec2 vTexCoords;
+attribute vec2 aVertexCoords;
 
 uniform sampler2D uPos;
 
@@ -11,7 +11,8 @@ void main() {
 	vec4 posFromTex = texture2D(uPos, aVertexCoords);
 	vec4 position = /*vec4((*/(posFromTex - .5) * 2.0/*).xy, 0.0,1.0)*/;
 
-	gl_PointSize = 5.0;
+	gl_PointSize = 2.0;
+
 	gl_Position = uPMatrix * uMVMatrix * position;
 
 }

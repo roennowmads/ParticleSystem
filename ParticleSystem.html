@@ -67,13 +67,10 @@
     <script type="text/javascript" language="javascript" src="Resources/Shader.js"></script>
     <script type="text/javascript" language="javascript" src="Resources/FBO.js"></script>
     <script type="text/javascript" language="javascript" src="Resources/GLObject.js"></script>
-    <script type="text/javascript" language="javascript" src="Resources/GLPlane.js"></script>
-    <script type="text/javascript" language="javascript" src="Resources/GLSimpleParticles.js"></script>
     <script type="text/javascript" language="javascript" src="Resources/GLShowParticles.js"></script>
     <script type="text/javascript" language="javascript" src="Resources/GLFBParticles.js"></script>
     <script type="text/javascript" language="javascript" src="ParticleSystem/view.js"></script>
     <script type="text/javascript" language="javascript" src="ParticleSystem/model.js"></script>
-    <!--script type="text/javascript" language="javascript" src="Resources/quatFun.js"></script-->
   </head>
 
   <body onload="main()">
@@ -92,6 +89,14 @@
 			<input style="text-align:right; width:70px" type="text" id="objectCount" value="800" maxlength="10" />
 			<button id="goButton">Go</button>
 			<div style="padding-bottom: 10px;">
+			</div>
+			<div>
+				<input type="checkbox" id="velInput" name="velInput" value="velInput" onchange="toggleVelocities()" checked>
+				<label for="velInput">Update velocities (or press x)</label>
+			</div>
+			<div>
+				<input type="checkbox" id="posInput" name="posInput" value="posInput" onchange="togglePositions()" checked>
+				<label for="posInput">Update positions (or press z)</label>
 			</div>
 		</div>
     </div>

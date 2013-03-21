@@ -29,7 +29,7 @@ function View () {
 	this.lastDrawTarget; 
 	this.currentTexture;
 
-	this.numPointsSqrt = 300;
+	this.numPointsSqrt = 128;
 	this.numPoints = this.numPointsSqrt*this.numPointsSqrt;
 
 	this.FB;
@@ -37,9 +37,12 @@ function View () {
 	this.texPos, this.texVel;
 	this.texCurrentPos, this.texAccel;
 
-	this.zoomFactor = 0.125;
+	this.zoomFactor = 1.0;
 	
 	this.first = true;
+	
+	this.isUpdatingVelocities = true;
+	this.isUpdatingPositions = true;
 }
 
 View.prototype.initView = function () {
@@ -104,7 +107,10 @@ View.prototype.animate = function () {
 	timeNow = Date.now();
 	var elapsed = timeNow - timeLast;
     var delta = 0.001 * elapsed;
-	this.rotYAngle += delta;
+	//this.rotYAngle += delta;
+	
+	if (this.isUpdatingPositions) 
+		this.rotYAngle = 0;
 		
 	timeLast = timeNow;
 }
@@ -117,7 +123,7 @@ View.prototype.draw = function () {
 
     mat4.translate(mvMatrix, [0, 0, -3.5]);
     var quatY = quat4.fromAngleAxis(0*Math.PI/2, [1,0,0]);
-	var quatX = quat4.fromAngleAxis(0*this.rotYAngle, [0,1,0]);
+	var quatX = quat4.fromAngleAxis(this.rotYAngle, [0,1,0]);
 	var quatRes = quat4.multiply(quatX, quatY);
 	var rotMatrix = quat4.toMat4(quatRes);
 	mat4.multiply(mvMatrix, rotMatrix);
@@ -128,14 +134,20 @@ View.prototype.draw = function () {
     var elapsedFromStart = (timeNow - startTime)*0.001;
     
     //Update velocities:
-    this.updateVelocities(this.gl);
+    if(this.isUpdatingVelocities)
+    	this.updateVelocities(this.gl);
     
     //Update positions:
-    this.updatePositions(this.gl);
+    if(this.isUpdatingPositions)
+    	this.updatePositions(this.gl);
 	
     //Draw on canvas:
+    mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
+    
     //this.drawParticles(this.gl); 
+    this.gl.enable(this.gl.BLEND);
     this.drawBillboards(this.gl);
+    this.gl.disable(this.gl.BLEND);
     
     
     //mat4.translate(mvMatrix, [0, 10, -10]);
@@ -212,7 +224,7 @@ View.prototype.draw = function () {
 View.prototype.setupCanvas = function (gl) {
 	gl.clearColor(0.1, 0.1, 0.2, 1.0);
 	//gl.enable(gl.DEPTH_TEST);
-	gl.enable(gl.BLEND);
+	//gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.frontFace(gl.CCW);
 	//gl.enable(gl.CULL_FACE);
@@ -284,8 +296,8 @@ View.prototype.drawInitialTextures = function (gl) {
 	
 	//Initialize position texture:
 	var elapsedFromStart = (timeNow - startTime)*0.001;
-	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -0.5, 0.5);
-	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 0.5);
+	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -0.5, -0.5);
+	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 1.0);
 	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
 	
 	gl.activeTexture(gl.TEXTURE0);

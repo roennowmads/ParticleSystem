@@ -20,13 +20,17 @@ GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCou
 	var vertexCoords = new Float32Array(array); 
 	array = null;
 	
+	// width / height:
 	var particleCountSqrt = particleCountSqrt;
 	
 	//From 1D array to 2D array:
 	for (var i = 0; i<this.indexNumItems; i++) {
+		var x = (i % particleCountSqrt) / particleCountSqrt; //column
+		var y = ((i+1) / particleCountSqrt) / particleCountSqrt; //row
+		
 		var j = i*2;
-		vertexCoords[j] = (j % particleCountSqrt) / particleCountSqrt; //column
-		vertexCoords[j+1] = ((j+1) / particleCountSqrt) / particleCountSqrt; //row
+		vertexCoords[j] = x;
+		vertexCoords[j+1] = y;
 	}
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexCoordsBuffer);
