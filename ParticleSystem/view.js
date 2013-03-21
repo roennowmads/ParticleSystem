@@ -29,7 +29,7 @@ function View () {
 	this.lastDrawTarget; 
 	this.currentTexture;
 
-	this.numPointsSqrt = 100;
+	this.numPointsSqrt = 300;
 	this.numPoints = this.numPointsSqrt*this.numPointsSqrt;
 
 	this.FB;
@@ -212,8 +212,8 @@ View.prototype.draw = function () {
 View.prototype.setupCanvas = function (gl) {
 	gl.clearColor(0.1, 0.1, 0.2, 1.0);
 	//gl.enable(gl.DEPTH_TEST);
-	//gl.enable(gl.BLEND);
-	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.frontFace(gl.CCW);
 	//gl.enable(gl.CULL_FACE);
 	//gl.cullFace(gl.BACK);
@@ -285,7 +285,7 @@ View.prototype.drawInitialTextures = function (gl) {
 	//Initialize position texture:
 	var elapsedFromStart = (timeNow - startTime)*0.001;
 	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -0.5, 0.5);
-	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 0.1);
+	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 0.5);
 	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
 	
 	gl.activeTexture(gl.TEXTURE0);
@@ -405,7 +405,7 @@ View.prototype.setupPhongShader = function (gl) {
 	this.cubeTex = new Texture();
 	
 	var objectLoader = new FileLoader(2, startTicking, this); 
-	loadImageToTex(gl, this.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/dog.png", objectLoader);
+	loadImageToTex(gl, this.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader);
 	loadMesh(gl, this.cubeModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
 }
 

@@ -16,12 +16,12 @@ void main(void) {
 	if (uMouseDown)
 		deltaDir = -deltaDir*0.25;
 
-	vec3 new = current + deltaDir*.04;
+	vec3 new = current + deltaDir*.03;
 
 	vec3 dir = normalize(new);
 	float len = length(new);
-	if (len > .3)
-		new = dir*.3;
+	if (len > .5)
+		new = dir*.5;
 
 	gl_FragColor = vec4((new), 1.0);
 }
