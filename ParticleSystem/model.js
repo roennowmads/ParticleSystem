@@ -32,6 +32,8 @@ function main () {
 		view.setupFBAndInitTextures(view.gl);
 		view.setupShowBillboardShader (view.gl);
 		view.first = true;
+		timeLast = Date.now();
+		startTime = Date.now();
 	}
 	
 	//Initialize mouse position to the middle of the canvas:
