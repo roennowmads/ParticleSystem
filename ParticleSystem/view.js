@@ -131,7 +131,7 @@ View.prototype.draw = function () {
     if (this.first) 
     	this.drawInitialTextures(this.gl);
     
-    //var elapsedFromStart = (timeNow - startTime)*0.001;
+    var elapsedFromStart = (timeNow - startTime)*0.001;
     
     //Update velocities:
     if(this.isUpdatingVelocities)
@@ -285,9 +285,7 @@ View.prototype.updateVelocities = function (gl) {
 View.prototype.updatePositions = function (gl) {
 	this.currentProgram = this.updatePosParticleShader.useProgram(gl);
     
-	var elapsedFromStart = (timeNow - startTime)*0.001;
-    gl.uniform1f(this.currentProgram.getUniform("timeUniform"), elapsedFromStart);
-	console.log(elapsedFromStart);
+    //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
 	
     this.FB.bindFBAndAttachTex(gl, this.texCurrentPos, this.FB.FB);
     this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texCurrentPos, this.texVel);

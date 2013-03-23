@@ -41,20 +41,6 @@ GLFBParticles.prototype.createQuadAndSetup = function (gl) {
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordsBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.DYNAMIC_DRAW);
-	
-	this.timesBuffer = gl.createBuffer();
-	
-	var times = new Float32Array([
-	                                  0.0,  0.0,
-	                                  10.0,  0.0,
-	                                  0.0,  10.0,
-	                                  0.0,  10.0,
-	                                  10.0,  0.0,
-	                                  10.0,  10.0
-	                                 ]);
-									 
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.timesBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, times, gl.DYNAMIC_DRAW);								 
 }
 
 GLFBParticles.prototype.bindBuffers = function (gl) {
@@ -63,9 +49,6 @@ GLFBParticles.prototype.bindBuffers = function (gl) {
 	
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordsBuffer);
 	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("texCoordsAttribute"), 2, gl.FLOAT, false, 0, 0);
-	
-	gl.bindBuffer(gl.ARRAY_BUFFER, this.timesBuffer);
-	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("timesAttribute"), 1, gl.FLOAT, false, 0, 0);
 }
 
 GLFBParticles.prototype.drawOnFB = function (gl, FBO) {
