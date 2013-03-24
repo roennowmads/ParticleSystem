@@ -11,6 +11,8 @@ function ShaderScriptLoader (gl, callback, callingClass) {
 	this.vsScriptObjs = [];
 	this.fsScriptObjs = [];
 	this.pointers = [];
+	
+	this.location = "Resources/Shaderfiles/";
 }
 
 ShaderScriptLoader.prototype.addProgram = function (programName, vsScriptAdd, fsScriptAdd) {
@@ -19,7 +21,6 @@ ShaderScriptLoader.prototype.addProgram = function (programName, vsScriptAdd, fs
 	
 	this.programsInds.push([programName, vsIndex, fsIndex]);
 }
-
 
 ShaderScriptLoader.prototype.findScript = function (list, scriptAdd) {
 	for (var i = 0; i < list.length; i++) {
@@ -35,11 +36,11 @@ ShaderScriptLoader.prototype.loadScripts = function () {
 	var objectLoader = new FileLoader(this.vsScriptAdds.length + this.fsScriptAdds.length, this.createPrograms, this); 
 	for (var i = 0; i < this.vsScriptAdds.length; i++) {
 		this.vsScriptObjs[i] = new ScriptObject();
-		loadShaderScript(this.vsScriptObjs[i], this.vsScriptAdds[i], objectLoader);
+		loadShaderScript(this.vsScriptObjs[i], this.location + this.vsScriptAdds[i] + ".vs", objectLoader);
 	}
 	for (var i = 0; i < this.fsScriptAdds.length; i++) {
 		this.fsScriptObjs[i] = new ScriptObject();
-		loadShaderScript(this.fsScriptObjs[i], this.fsScriptAdds[i], objectLoader);
+		loadShaderScript(this.fsScriptObjs[i], this.location + this.fsScriptAdds[i] + ".fs", objectLoader);
 	}
 }
 

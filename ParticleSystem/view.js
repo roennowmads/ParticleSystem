@@ -39,11 +39,11 @@ View.prototype.initView = function () {
 		alert("OES_texture_float extension is not available!");
 		
 	this.scripts = new ShaderScriptLoader(this.gl, this.loadTextures, this);
-	this.scripts.addProgram("showBillboardShader", "Resources/Shaderfiles/showBillboardVShader.c", "Resources/Shaderfiles/showBillboardFShader.c");
-	this.scripts.addProgram("initialParticleShader", "Resources/Shaderfiles/FBTextureVShader.c", "Resources/Shaderfiles/initialParticleFShader.c");
-	this.scripts.addProgram("updateVelParticleShader", "Resources/Shaderfiles/FBTextureVShader.c", "Resources/Shaderfiles/updateVelParticleFShader.c");
-	this.scripts.addProgram("updatePosParticleShader", "Resources/Shaderfiles/FBTextureVShader.c", "Resources/Shaderfiles/updatePosParticleFShader.c");
-	this.scripts.addProgram("phongShader", "Resources/Shaderfiles/phongVShader.c", "Resources/Shaderfiles/phongFShader.c");
+	this.scripts.addProgram("showBillboardShader", "showBillboard", "showBillboard");
+	this.scripts.addProgram("initialParticleShader", "FBTexture", "initialParticle");
+	this.scripts.addProgram("updateVelParticleShader", "FBTexture", "updateVelParticle");
+	this.scripts.addProgram("updatePosParticleShader", "FBTexture", "updatePosParticle");
+	this.scripts.addProgram("phongShader", "phong", "phong");
 	
 	//Downloads scripts and calls loadTextures when done, which calls setupShadersAndObjects when done:
 	this.scripts.loadScripts();
