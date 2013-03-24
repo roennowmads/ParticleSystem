@@ -86,6 +86,17 @@ View.prototype.draw = function () {
 	var rotMatrix = quat4.toMat4(quatRes);
 	mat4.multiply(mvMatrix, rotMatrix);
     
+	this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
+    this.cubeModel.texture = this.cubeTex.texture;	
+	
+	mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
+	
+	mvPushMatrix();
+		mat4.scale(mvMatrix, [.5, .5, .5]);
+		this.cubeModel.draw(this.gl);
+	mvPopMatrix();
+	
+	
     if (this.first) 
     	this.drawInitialTextures(this.gl);
     
@@ -100,12 +111,7 @@ View.prototype.draw = function () {
     	this.updatePositions(this.gl);
 	
     //Draw on canvas:
-    mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
-    
-    //this.drawParticles(this.gl); 
-    this.gl.enable(this.gl.BLEND);
-    this.drawBillboards(this.gl);
-    this.gl.disable(this.gl.BLEND);
+	this.drawBillboards(this.gl);
     
     
     //mat4.translate(mvMatrix, [0, 10, -10]);
@@ -170,23 +176,18 @@ View.prototype.draw = function () {
 		drawParticles(gl);
 	mvPopMatrix();
 	*/
-	this.gl.enable(this.gl.BLEND);
-    this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
-    this.cubeModel.texture = this.cubeTex.texture;
-    this.cubeModel.draw(this.gl);
-    this.gl.disable(this.gl.BLEND);
     
    
 }
 
 View.prototype.setupCanvas = function (gl) {
 	gl.clearColor(0.1, 0.1, 0.2, 1.0);
-	//gl.enable(gl.DEPTH_TEST);
-	//gl.enable(gl.BLEND);
+	gl.enable(gl.DEPTH_TEST);
+	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-	//gl.frontFace(gl.CCW);
-	//gl.enable(gl.CULL_FACE);
-	//gl.cullFace(gl.BACK);
+	gl.frontFace(gl.CCW);
+	gl.enable(gl.CULL_FACE);
+	gl.cullFace(gl.BACK);
 	
 	mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 1000.0, pMatrix);
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
