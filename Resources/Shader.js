@@ -5,7 +5,7 @@ function ScriptObject () {
 }
 
 
-function Shader (gl, fragmentScript, vertexScript) {
+function Shader (gl, vertexScript, fragmentScript) {
 	this.program;
 	this.vShader;
 	this.fShader;

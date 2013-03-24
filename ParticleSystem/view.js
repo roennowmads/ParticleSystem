@@ -1,41 +1,41 @@
 "use strict";
 
-function View () {
+function View() {
 	this.canvas;
 	this.gl;
-	this.cubeModel, this.planeModel, this.FBparticlesModel, this.showParticlesModel;
-	this.cubeTex, this.planeTex;
+	this.cubeModel; this.planeModel; this.FBparticlesModel; this.showParticlesModel;
+	this.cubeTex; this.planeTex;
 	this.rotYAngle = 0;
 
-	this.showParticleVScriptObj, this.showParticleFScriptObj;
+	this.showParticleVScriptObj; this.showParticleFScriptObj;
 	this.FBTextureVScriptObj;
 	this.initialParticleFScriptObj;
 	this.updateParticleFScriptObj;
-	this.pdateVelParticleFScriptObj;
+	this.updateVelParticleFScriptObj;
 	this.updatePosParticleFScriptObj;
 
-	this.phongVScriptObj, this.phongFScriptObj;
-	this.showBillboardVScriptObj, this.showBillboardFScriptObj;
+	this.phongVScriptObj; this.phongFScriptObj;
+	this.showBillboardVScriptObj; this.showBillboardFScriptObj;
 
-	this.currentProgram; 
-	this.showParticleShader, this.initialParticleShader;
-	this.updateParticleShader, this.updateVelParticleShader;
-	this.updatePosParticleShader, this.phongShader;
+	this.currentProgram;
+	this.showParticleShader; this.initialParticleShader;
+	this.updateParticleShader; this.updateVelParticleShader;
+	this.updatePosParticleShader; this.phongShader;
 	this.showBillboardShader;
 
 	this.DRAWTARGETS = { CANVAS : 0, FRAMEBUFFER : 1 };
 
 	this.lastGLObject;
-	this.lastDrawTarget; 
+	this.lastDrawTarget;
 	this.currentTexture;
 
 	this.numPointsSqrt = 128;
-	this.numPoints = this.numPointsSqrt*this.numPointsSqrt;
+	this.numPoints = this.numPointsSqrt * this.numPointsSqrt;
 
 	this.FB;
 
-	this.texPos, this.texVel;
-	this.texCurrentPos, this.texAccel;
+	this.texPos; this.texVel;
+	this.texCurrentPos; this.texAccel;
 
 	this.zoomFactor = 1.0;
 	
@@ -43,6 +43,13 @@ function View () {
 	
 	this.isUpdatingVelocities = true;
 	this.isUpdatingPositions = true;
+	
+	
+	/*this.scripts = new ShaderScriptLoader(this.gl);
+	this.scripts.addProgram("Resources/Shaderfiles/showParticleVShader.c", "Resources/Shaderfiles/showParticleFShader.c", "program1");*/
+	/*this.scripts.addProgram("vs2", "fs1", "program2");
+	this.scripts.addProgram("vs1", "fs2", "program3");
+	this.scripts.addProgram("vs3", "fs3", "program4");*/
 }
 
 View.prototype.initView = function () {
@@ -51,8 +58,11 @@ View.prototype.initView = function () {
 	var float_texture_ext = this.gl.getExtension('OES_texture_float');
 	if (!float_texture_ext)
 		alert("OES_texture_float extension is not available!");
+		
+	this.scripts = new ShaderScriptLoader(this.gl);
+	this.scripts.addProgram("Resources/Shaderfiles/showParticleVShader.c", "Resources/Shaderfiles/showParticleFShader.c", "program1");
 	
-	this.FBTextureVScriptObj = new ScriptObject();
+	/*this.FBTextureVScriptObj = new ScriptObject();
 	this.initialParticleFScriptObj = new ScriptObject();
 	this.showParticleVScriptObj = new ScriptObject();
 	this.showParticleFScriptObj = new ScriptObject();
@@ -63,10 +73,10 @@ View.prototype.initView = function () {
 	this.showBillboardFScriptObj = new ScriptObject();
 	
 	this.phongVScriptObj = new ScriptObject();
-	this.phongFScriptObj = new ScriptObject();
+	this.phongFScriptObj = new ScriptObject();*/
 	
-	//Loads shaders, and calls setupShadersAndObjects when done:
-	var objectLoader = new FileLoader(11, this.setupShadersAndObjects, this); 
+	//Loads shaders, and calls loadTextures when done:
+	/*var objectLoader = new FileLoader(11, this.loadTextures, this); 
 	loadShaderScript(this.FBTextureVScriptObj, "Resources/Shaderfiles/FBTextureVShader.c", objectLoader);
 	loadShaderScript(this.initialParticleFScriptObj, "Resources/Shaderfiles/initialParticleFShader.c", objectLoader);
 	loadShaderScript(this.showParticleVScriptObj, "Resources/Shaderfiles/showParticleVShader.c", objectLoader);
@@ -77,7 +87,11 @@ View.prototype.initView = function () {
 	loadShaderScript(this.phongVScriptObj, "Resources/Shaderfiles/phongVShader.c", objectLoader);
 	loadShaderScript(this.phongFScriptObj, "Resources/Shaderfiles/phongFShader.c", objectLoader);
 	loadShaderScript(this.showBillboardVScriptObj, "Resources/Shaderfiles/showBillboardVShader.c", objectLoader);
-	loadShaderScript(this.showBillboardFScriptObj, "Resources/Shaderfiles/showBillboardFShader.c", objectLoader);
+	loadShaderScript(this.showBillboardFScriptObj, "Resources/Shaderfiles/showBillboardFShader.c", objectLoader);*/
+}
+
+View.prototype.doneLoadingScripts = function (thisClass) {
+	thisClass.loadTextures(thisClass);
 }
 
 View.prototype.setupShadersAndObjects = function (thisClass) {	
@@ -212,11 +226,11 @@ View.prototype.draw = function () {
 		drawParticles(gl);
 	mvPopMatrix();
 	*/
-	//gl.enable(gl.BLEND);
-    //this.currentProgram = this.phongShader.useProgram(this.gl);
-    //this.cubeModel.texture = this.cubeTex.texture;
-    //this.cubeModel.draw(this.gl);
-    //gl.disable(gl.BLEND);
+	this.gl.enable(this.gl.BLEND);
+    this.currentProgram = this.phongShader.useProgram(this.gl);
+    this.cubeModel.texture = this.cubeTex.texture;
+    this.cubeModel.draw(this.gl);
+    this.gl.disable(this.gl.BLEND);
     
    
 }
@@ -267,7 +281,7 @@ View.prototype.drawBillboards = function (gl) {
 		this.showParticlesModel.posTex = this.texCurrentPos;
 		//gl.activeTexture(gl.TEXTURE0);
 		
-	    this.showParticlesModel.drawBillboards(gl, this.cubeTex.texture);
+	    this.showParticlesModel.drawBillboards(gl, this.smokeTex.texture);
     mvPopMatrix();
 }
 
@@ -414,11 +428,18 @@ View.prototype.setupPhongShader = function (gl) {
 	this.setNormalUniforms(gl); 
 	
 	this.cubeModel = new GLObject(gl, this);
-	this.cubeTex = new Texture();
 	
-	var objectLoader = new FileLoader(2, startTicking, this); 
-	loadImageToTex(gl, this.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader);
+	var objectLoader = new FileLoader(1, startTicking, this); 
 	loadMesh(gl, this.cubeModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
+}
+
+View.prototype.loadTextures = function(thisClass) {
+	thisClass.cubeTex = new Texture();
+	thisClass.smokeTex = new Texture();
+
+	var objectLoader = new FileLoader(2, thisClass.setupShadersAndObjects, thisClass); 
+	loadImageToTex(thisClass.gl, thisClass.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/red.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.smokeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader);
 }
 
 View.prototype.setPMatrixUniform = function (gl) {

@@ -10,7 +10,7 @@ function GLShowParticles (gl, id, view) {
 	this.view = view;
 }
 
-GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCountSqrt, tex) {
+GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCountSqrt, tex) {	
 	this.vertexCoordsBuffer = gl.createBuffer();
 	
 	this.itemSize = 2;
