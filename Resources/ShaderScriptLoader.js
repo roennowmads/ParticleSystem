@@ -1,7 +1,9 @@
 "use strict";
 
-function ShaderScriptLoader (gl) {
+function ShaderScriptLoader (gl, callback, callingClass) {
 	this.gl = gl;
+	this.callback = callback;
+	this.callingClass = callingClass;
 	this.programsInds = []; // { (vsIndex,fsIndex), (vsIndex,fsIndex), (vsIndex,fsIndex), ...}
 	this.programs = [];
 	this.vsScriptAdds = [];
@@ -11,25 +13,12 @@ function ShaderScriptLoader (gl) {
 	this.pointers = [];
 }
 
-ShaderScriptLoader.prototype.addProgram = function (vsScriptAdd, fsScriptAdd, programName) {
+ShaderScriptLoader.prototype.addProgram = function (programName, vsScriptAdd, fsScriptAdd) {
 	var vsIndex = this.findScript(this.vsScriptAdds, vsScriptAdd);
 	var fsIndex = this.findScript(this.fsScriptAdds, fsScriptAdd);
 	
-	this.programsInds.push([vsIndex, fsIndex]);
-	
-	this.loadScripts(programName, vsIndex, fsIndex);
+	this.programsInds.push([programName, vsIndex, fsIndex]);
 }
-
-ShaderScriptLoader.prototype.addProgramCont = function (programName, vsIndex, fsIndex) {
-	console.log("yeah! " + programName + " " + vsIndex + " " + fsIndex);
-	this.pointers[programName] = this.programs.push(new Shader(this.gl, this.vsScriptObjs[vsIndex].script, this.fsScriptObjs[fsIndex].script)) - 1;
-}
-
-/*ShaderScriptLoader.prototype.createPrograms = function () { 
-	for (var i = 0; i < programInds.length; i++) {
-		console.log(programInds[i].vs + " " + programInds[i].fs)
-	}
-}*/
 
 
 ShaderScriptLoader.prototype.findScript = function (list, scriptAdd) {
@@ -41,10 +30,9 @@ ShaderScriptLoader.prototype.findScript = function (list, scriptAdd) {
 	return list.push(scriptAdd) - 1;
 }
 
-ShaderScriptLoader.prototype.loadScripts = function (programName, vsIndex, fsIndex) {
-	console.log("script count " + (this.vsScriptAdds.length + this.fsScriptAdds.length));
+ShaderScriptLoader.prototype.loadScripts = function () {
 
-	var objectLoader = new FileLoader(this.vsScriptAdds.length + this.fsScriptAdds.length, this.addProgramCont.bind(this, programName, vsIndex, fsIndex), this); 
+	var objectLoader = new FileLoader(this.vsScriptAdds.length + this.fsScriptAdds.length, this.createPrograms, this); 
 	for (var i = 0; i < this.vsScriptAdds.length; i++) {
 		this.vsScriptObjs[i] = new ScriptObject();
 		loadShaderScript(this.vsScriptObjs[i], this.vsScriptAdds[i], objectLoader);
@@ -53,6 +41,18 @@ ShaderScriptLoader.prototype.loadScripts = function (programName, vsIndex, fsInd
 		this.fsScriptObjs[i] = new ScriptObject();
 		loadShaderScript(this.fsScriptObjs[i], this.fsScriptAdds[i], objectLoader);
 	}
+}
+
+ShaderScriptLoader.prototype.createPrograms = function (thisClass) { 
+	for (var i = 0; i < thisClass.programsInds.length; i++) {		
+		var programName = thisClass.programsInds[i][0];
+		var vsScript = thisClass.vsScriptObjs[thisClass.programsInds[i][1]].script;
+		var fsScript = thisClass.fsScriptObjs[thisClass.programsInds[i][2]].script;
+		
+		thisClass.pointers[programName] = thisClass.programs.push(new Shader(thisClass.gl, vsScript, fsScript)) - 1;
+	}
+	
+	thisClass.callback(thisClass.callingClass);
 }
 
 ShaderScriptLoader.prototype.getProgram = function(name) {

@@ -7,22 +7,6 @@ function View() {
 	this.cubeTex; this.planeTex;
 	this.rotYAngle = 0;
 
-	this.showParticleVScriptObj; this.showParticleFScriptObj;
-	this.FBTextureVScriptObj;
-	this.initialParticleFScriptObj;
-	this.updateParticleFScriptObj;
-	this.updateVelParticleFScriptObj;
-	this.updatePosParticleFScriptObj;
-
-	this.phongVScriptObj; this.phongFScriptObj;
-	this.showBillboardVScriptObj; this.showBillboardFScriptObj;
-
-	this.currentProgram;
-	this.showParticleShader; this.initialParticleShader;
-	this.updateParticleShader; this.updateVelParticleShader;
-	this.updatePosParticleShader; this.phongShader;
-	this.showBillboardShader;
-
 	this.DRAWTARGETS = { CANVAS : 0, FRAMEBUFFER : 1 };
 
 	this.lastGLObject;
@@ -44,12 +28,7 @@ function View() {
 	this.isUpdatingVelocities = true;
 	this.isUpdatingPositions = true;
 	
-	
-	/*this.scripts = new ShaderScriptLoader(this.gl);
-	this.scripts.addProgram("Resources/Shaderfiles/showParticleVShader.c", "Resources/Shaderfiles/showParticleFShader.c", "program1");*/
-	/*this.scripts.addProgram("vs2", "fs1", "program2");
-	this.scripts.addProgram("vs1", "fs2", "program3");
-	this.scripts.addProgram("vs3", "fs3", "program4");*/
+	this.scripts;
 }
 
 View.prototype.initView = function () {
@@ -59,58 +38,23 @@ View.prototype.initView = function () {
 	if (!float_texture_ext)
 		alert("OES_texture_float extension is not available!");
 		
-	this.scripts = new ShaderScriptLoader(this.gl);
-	this.scripts.addProgram("Resources/Shaderfiles/showParticleVShader.c", "Resources/Shaderfiles/showParticleFShader.c", "program1");
+	this.scripts = new ShaderScriptLoader(this.gl, this.loadTextures, this);
+	this.scripts.addProgram("showBillboardShader", "Resources/Shaderfiles/showBillboardVShader.c", "Resources/Shaderfiles/showBillboardFShader.c");
+	this.scripts.addProgram("initialParticleShader", "Resources/Shaderfiles/FBTextureVShader.c", "Resources/Shaderfiles/initialParticleFShader.c");
+	this.scripts.addProgram("updateVelParticleShader", "Resources/Shaderfiles/FBTextureVShader.c", "Resources/Shaderfiles/updateVelParticleFShader.c");
+	this.scripts.addProgram("updatePosParticleShader", "Resources/Shaderfiles/FBTextureVShader.c", "Resources/Shaderfiles/updatePosParticleFShader.c");
+	this.scripts.addProgram("phongShader", "Resources/Shaderfiles/phongVShader.c", "Resources/Shaderfiles/phongFShader.c");
 	
-	/*this.FBTextureVScriptObj = new ScriptObject();
-	this.initialParticleFScriptObj = new ScriptObject();
-	this.showParticleVScriptObj = new ScriptObject();
-	this.showParticleFScriptObj = new ScriptObject();
-	this.updateParticleFScriptObj = new ScriptObject();
-	this.updateVelParticleFScriptObj = new ScriptObject();
-	this.updatePosParticleFScriptObj = new ScriptObject();
-	this.showBillboardVScriptObj = new ScriptObject();
-	this.showBillboardFScriptObj = new ScriptObject();
-	
-	this.phongVScriptObj = new ScriptObject();
-	this.phongFScriptObj = new ScriptObject();*/
-	
-	//Loads shaders, and calls loadTextures when done:
-	/*var objectLoader = new FileLoader(11, this.loadTextures, this); 
-	loadShaderScript(this.FBTextureVScriptObj, "Resources/Shaderfiles/FBTextureVShader.c", objectLoader);
-	loadShaderScript(this.initialParticleFScriptObj, "Resources/Shaderfiles/initialParticleFShader.c", objectLoader);
-	loadShaderScript(this.showParticleVScriptObj, "Resources/Shaderfiles/showParticleVShader.c", objectLoader);
-	loadShaderScript(this.showParticleFScriptObj, "Resources/Shaderfiles/showParticleFShader.c", objectLoader);
-	loadShaderScript(this.updateParticleFScriptObj, "Resources/Shaderfiles/updateParticleFShader.c", objectLoader);
-	loadShaderScript(this.updateVelParticleFScriptObj, "Resources/Shaderfiles/updateVelParticleFShader.c", objectLoader);
-	loadShaderScript(this.updatePosParticleFScriptObj, "Resources/Shaderfiles/updatePosParticleFShader.c", objectLoader);
-	loadShaderScript(this.phongVScriptObj, "Resources/Shaderfiles/phongVShader.c", objectLoader);
-	loadShaderScript(this.phongFScriptObj, "Resources/Shaderfiles/phongFShader.c", objectLoader);
-	loadShaderScript(this.showBillboardVScriptObj, "Resources/Shaderfiles/showBillboardVShader.c", objectLoader);
-	loadShaderScript(this.showBillboardFScriptObj, "Resources/Shaderfiles/showBillboardFShader.c", objectLoader);*/
-}
-
-View.prototype.doneLoadingScripts = function (thisClass) {
-	thisClass.loadTextures(thisClass);
+	//Downloads scripts and calls loadTextures when done, which calls setupShadersAndObjects when done:
+	this.scripts.loadScripts();
 }
 
 View.prototype.setupShadersAndObjects = function (thisClass) {	
-	//thisClass.showParticleShader = new Shader(thisClass.gl, thisClass.showParticleFScriptObj.script, thisClass.showParticleVScriptObj.script);
-	thisClass.initialParticleShader = new Shader(thisClass.gl, thisClass.initialParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
-	thisClass.updateParticleShader = new Shader(thisClass.gl, thisClass.updateParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
-	thisClass.updateVelParticleShader = new Shader(thisClass.gl, thisClass.updateVelParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
-	thisClass.updatePosParticleShader = new Shader(thisClass.gl, thisClass.updatePosParticleFScriptObj.script, thisClass.FBTextureVScriptObj.script);
-	thisClass.phongShader = new Shader(thisClass.gl, thisClass.phongFScriptObj.script, thisClass.phongVScriptObj.script);
-	thisClass.showBillboardShader = new Shader(thisClass.gl, thisClass.showBillboardFScriptObj.script, thisClass.showBillboardVScriptObj.script);
-	
 	thisClass.setupCanvas(thisClass.gl);
-	
-	//setupParticleShader(gl, updateParticleShader);
 	
 	thisClass.setupUpdateVelShader(thisClass.gl);
 	thisClass.setupUpdatePosShader(thisClass.gl);
 	thisClass.setupFBAndInitTextures(thisClass.gl);
-	//thisClass.setupShowParticleShader(thisClass.gl);
 	thisClass.setupShowBillboardShader(thisClass.gl);
 	thisClass.setupPhongShader(thisClass.gl);
 	
@@ -227,7 +171,7 @@ View.prototype.draw = function () {
 	mvPopMatrix();
 	*/
 	this.gl.enable(this.gl.BLEND);
-    this.currentProgram = this.phongShader.useProgram(this.gl);
+    this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
     this.cubeModel.texture = this.cubeTex.texture;
     this.cubeModel.draw(this.gl);
     this.gl.disable(this.gl.BLEND);
@@ -273,7 +217,7 @@ View.prototype.drawParticles = function (gl) {
 }
 
 View.prototype.drawBillboards = function (gl) {
-	this.currentProgram = this.showBillboardShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
 	mvPushMatrix();
 	    mat4.translate(mvMatrix, [0, 0, 1]);
@@ -286,7 +230,7 @@ View.prototype.drawBillboards = function (gl) {
 }
 
 View.prototype.updateVelocities = function (gl) {
-	this.currentProgram = this.updateVelParticleShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("updateVelParticleShader").useProgram(gl);
     
     //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
     gl.uniform2f(this.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/mouseX*2.1/gl.viewportWidth - 0.55, 1 - mouseY*1.5/gl.viewportHeight + 0.25 /*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
@@ -297,7 +241,7 @@ View.prototype.updateVelocities = function (gl) {
 }
 
 View.prototype.updatePositions = function (gl) {
-	this.currentProgram = this.updatePosParticleShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("updatePosParticleShader").useProgram(gl);
     
     //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
 	
@@ -306,7 +250,7 @@ View.prototype.updatePositions = function (gl) {
 }
 
 View.prototype.drawInitialTextures = function (gl) {
-	this.currentProgram = this.initialParticleShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("initialParticleShader").useProgram(gl);
 	
 	//Initialize position texture:
 	var elapsedFromStart = (timeNow - startTime)*0.001;
@@ -336,7 +280,7 @@ View.prototype.drawInitialTextures = function (gl) {
 }
 
 View.prototype.setupShowBillboardShader = function (gl) {
-	this.currentProgram = this.showBillboardShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
 	gl.activeTexture(gl.TEXTURE0);
 	gl.uniform1i(this.currentProgram.getUniform("posUniform"), 0);
@@ -354,7 +298,7 @@ View.prototype.setupShowBillboardShader = function (gl) {
 }
 
 View.prototype.setupUpdatePosShader = function (gl) {
-	this.currentProgram = this.updatePosParticleShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("updatePosParticleShader").useProgram(gl);
 	
 	gl.activeTexture(gl.TEXTURE0);
 	gl.uniform1i(this.currentProgram.getUniform("currentPosUniform"), 0);
@@ -366,7 +310,7 @@ View.prototype.setupUpdatePosShader = function (gl) {
 }
 
 View.prototype.setupUpdateVelShader = function (gl) {
-	this.currentProgram = this.updateVelParticleShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("updateVelParticleShader").useProgram(gl);
 	
 	gl.activeTexture(gl.TEXTURE0);
 	gl.uniform1i(this.currentProgram.getUniform("currentVelUniform"), 0);
@@ -421,7 +365,7 @@ View.prototype.setupShowParticleShader = function (gl) {
 }
 
 View.prototype.setupPhongShader = function (gl) {
-	this.currentProgram = this.phongShader.useProgram(gl);
+	this.currentProgram = this.scripts.getProgram("phongShader").useProgram(gl);
 	gl.uniform3f(this.currentProgram.getUniform("lightingPositionUniform"), 0, 0, 0);
 	this.setMVMatrixUniforms(gl);
 	this.setPMatrixUniform(gl);
