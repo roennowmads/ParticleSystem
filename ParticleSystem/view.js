@@ -92,8 +92,11 @@ View.prototype.draw = function () {
 	mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
 	
 	mvPushMatrix();
-		mat4.scale(mvMatrix, [.5, .5, .5]);
+		this.gl.disable(this.gl.BLEND);
+		mat4.translate(mvMatrix, [0.0,-.5,0.0]);
+		mat4.scale(mvMatrix, [1, .0625, 1]);
 		this.cubeModel.draw(this.gl);
+		this.gl.enable(this.gl.BLEND);
 	mvPopMatrix();
 	
 	
@@ -183,7 +186,7 @@ View.prototype.draw = function () {
 View.prototype.setupCanvas = function (gl) {
 	gl.clearColor(0.1, 0.1, 0.2, 1.0);
 	gl.enable(gl.DEPTH_TEST);
-	gl.enable(gl.BLEND);
+	//gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	gl.frontFace(gl.CCW);
 	gl.enable(gl.CULL_FACE);
@@ -235,7 +238,7 @@ View.prototype.updateVelocities = function (gl) {
     
     //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
     gl.uniform2f(this.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/mouseX*2.1/gl.viewportWidth - 0.55, 1 - mouseY*1.5/gl.viewportHeight + 0.25 /*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
-    gl.uniform1i(this.currentProgram.getUniform("mouseDownUniform"), mouseDown);  
+    gl.uniform1f(this.currentProgram.getUniform("mouseDownUniform"), mouseDown ? -1 : 1);  
     
     this.FB.bindFBAndAttachTex(gl, this.texVel, this.FB.FB);
     this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texVel, this.texCurrentPos);

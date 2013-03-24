@@ -9,6 +9,9 @@ var time = new Date().getTime();
 var time1Sec = 0;
 var fps = 0;
 
+var FPSSum = 0;
+var FPSsamplesNum = 0;
+
 var fragmentScript = null;
 //var vertexScript = null;
 
@@ -17,9 +20,17 @@ function logFrameRate() {
 	time1Sec = new Date().getTime();
 	if (time <= time1Sec - 1000) {
 		fps = frames;
-		document.getElementById("FPS").innerHTML = "Framerate: " + fps;
 		time = new Date().getTime();
 		frames = 0;
+		
+		FPSsamplesNum++;
+		FPSSum += fps;
+		document.getElementById("FPS").innerHTML = "FPS: " + fps + " --- " + "Avg FPS: " + Math.floor(FPSSum/FPSsamplesNum);
+		
+		if (FPSsamplesNum > 5) {		
+			FPSSum = 0;
+			FPSsamplesNum = 0;
+		}
 	}
 }
 
