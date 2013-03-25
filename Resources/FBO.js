@@ -16,8 +16,8 @@ FBO.prototype.createFrameBuffer = function (gl, width, height) {
     //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
-FBO.prototype.bindFBAndAttachTex = function (gl, tex, FB) {
-	gl.bindFramebuffer(gl.FRAMEBUFFER, FB);
+FBO.prototype.bindFBAndAttachTex = function (gl, tex) {
+	gl.bindFramebuffer(gl.FRAMEBUFFER, this.FB);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
@@ -36,7 +36,7 @@ function createAndSetupTexture (gl, width, height) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	
 	// make the texture the same size as the image
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.FLOAT, null);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.FLOAT, null);
 	
 	return texture;
 }

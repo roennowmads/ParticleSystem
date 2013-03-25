@@ -64,7 +64,7 @@ GLShowParticles.prototype.drawBillboards = function (gl, billboardTex) {
 	this.view.setMVMatrixUniforms(gl);
 	gl.drawArrays(gl.POINTS, 0, this.indexNumItems)
 }
-
+/*
 GLShowParticles.prototype.draw = function (gl, texVel) {
 	//If somehow I could optimize by checking whether all previous changes where done on another program, then i wouldn't have to update.
 	//if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.CANVAS) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
@@ -87,4 +87,4 @@ GLShowParticles.prototype.draw = function (gl, texVel) {
 	
 	//lastGLObject = this.identifier;
     //lastDrawTarget = DRAWTARGETS.CANVAS;
-}
+}*/

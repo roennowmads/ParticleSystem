@@ -45,7 +45,7 @@
 		
 		.sidebar {
 			background: rgb(220,220,240);
-			width:250px; 
+			width:260px; 
 			margin-top: 5px;
 			border: 1px solid rgb(180,180,200);
 		}
@@ -86,23 +86,24 @@
 		</div>
 		<div class="sidebar">	
     		<h2>Options:</h2>
-			<label for="objectCount">The square root of the number of particles (should be power of 2):</label>
-			<input style="text-align:right; width:70px" type="text" id="objectCount" value="800" maxlength="10" />
-			<button id="goButton">Go</button>
 			<div style="padding-bottom: 10px;">
+				<label for="objectCount">The square root of the number of particles (should be power of 2):</label>
+				<input style="text-align:right; width:70px" type="text" id="objectCount" value="800" maxlength="10" />
+				<button id="goButton">Go</button>
 			</div>
 			<div>
 				<input type="checkbox" id="velInput" name="velInput" value="velInput" onchange="toggleVelocities()" checked>
 				<label for="velInput">Update velocities (or press x)</label>
 			</div>
-			<div>
+			<div style="padding-bottom: 10px;">
 				<input type="checkbox" id="posInput" name="posInput" value="posInput" onchange="togglePositions()" checked>
 				<label for="posInput">Update positions (or press z)</label>
 			</div>
 			<div style="padding-bottom: 10px;">
-			</div>
-			<div>
 				If positions are not being updated, use arrow keys to rotate and zoom. 
+			</div>
+			<div style="padding-bottom: 10px;">
+				<button id="fullscreen">Fullscreen</button>
 			</div>
 		</div>
     </div>

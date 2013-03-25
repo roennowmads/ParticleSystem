@@ -9,14 +9,14 @@ uniform float uMouseDown;
 varying vec2 vTexCoords;
 
 void main(void) {
-	vec3 current = texture2D(uCurrentVel, vTexCoords).xyz;
+	vec3 current = vec3(texture2D(uCurrentVel, vTexCoords));
 
 	vec3 accelPoint = vec3(texture2D(uCurrentPos, vTexCoords));
-	vec3 deltaDir = vec3((normalize(vec3(uMousePos, 0.0) - accelPoint))) + vec3(cos(gl_FragCoord.y)*7.0, /*cos(gl_FragCoord.y)*7.0*/ 0.0, 0.0)*0.1;
+	vec3 deltaDir = normalize(vec3(uMousePos, 0.0) - accelPoint) + vec3(cos(gl_FragCoord.y)*7.0, /*cos(gl_FragCoord.y)*7.0*/ 0.0, 0.0)*0.1;
 	
 	deltaDir = uMouseDown*deltaDir;
 
-	vec3 new = current + deltaDir*.03;
+	vec3 new = current + deltaDir*.03*uTime;
 
 	vec3 dir = normalize(new);
 	float len = length(new);

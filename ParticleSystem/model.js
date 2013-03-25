@@ -10,6 +10,8 @@ var mouseDown = false;
 var Keys = {RIGHT : 39, LEFT : 37, DOWN : 40, UP : 38, SPACE : 32};
 
 var view;
+var origWidth;
+var origHeight;
 
 function main () {
 	view = new View();
@@ -18,11 +20,17 @@ function main () {
 	document.onkeydown = onKeyDown;
 	
 	var canvasElm = document.getElementById("canvas");
+	origWidth = canvasElm.width;
+	origHeight = canvasElm.height;
 	
 	canvasElm.onmouseover = function () { mouseOver = true; }
 	canvasElm.onmouseout = function () { mouseOver = false; }
 	canvasElm.onmousedown = function (e) { mouseDown = true; e.preventDefault(); }
 	canvasElm.onmouseup = function () { mouseDown = false; }
+	
+	document.addEventListener("webkitfullscreenchange", fullscreenChange, false)
+	document.addEventListener("mozfullscreenchange", fullscreenChange, false)
+	document.getElementById("fullscreen").onclick = onFullscreenClick;
 	
 	document.getElementById("objectCount").value = view.numPointsSqrt; 
 	document.getElementById("goButton").onclick = function () {
@@ -100,6 +108,11 @@ function onKeyDown (e) {
 			view.zoomFactor *= 0.99;
 		e.preventDefault();
 		break;
+	case Keys.SPACE:
+		var count = document.getElementById("objectCount").value;
+		view = new View();
+		view.initView();
+		break;
 	}
 }
 
@@ -147,4 +160,28 @@ FileLoader.prototype.count = function () {
 	if (this.filesLoaded == this.fileCount) {
 		this.onCompleteFunction(this.originClass);
 	}
+}
+
+function onFullscreenClick () {
+	if (view.canvas.webkitRequestFullScreen)
+		view.canvas.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+	else if (view.canvas.mozRequestFullScreen)
+		view.canvas.mozRequestFullScreen();
+}
+
+function fullscreenChange () {
+	console.log("hello");
+	if (document.webkitIsFullScreen || document.mozFullScreenElement) {
+		view.canvas.width = screen.width;
+		view.canvas.height = screen.height;
+		view = new View();
+		view.initView();
+	}
+	else {
+		view.canvas.width = origWidth;
+		view.canvas.height = origHeight;
+		view = new View();
+		view.initView();
+	}
+	view.gl.viewport(0, 0, view.canvas.width, view.canvas.height);
 }

@@ -6,6 +6,7 @@ function View() {
 	this.cubeModel; this.planeModel; this.FBparticlesModel; this.showParticlesModel;
 	this.cubeTex; this.planeTex;
 	this.rotYAngle = 0;
+	this.deltaTime = 0;
 
 	this.DRAWTARGETS = { CANVAS : 0, FRAMEBUFFER : 1 };
 
@@ -64,7 +65,9 @@ View.prototype.setupShadersAndObjects = function (thisClass) {
 View.prototype.animate = function () {
 	timeNow = Date.now();
 	var elapsed = timeNow - timeLast;
-    var delta = 0.001 * elapsed;
+    this.deltaTime = 0.001 * elapsed * 60;
+	
+	//console.log(this.deltaTime);
 	//this.rotYAngle += delta;
 	
 	if (this.isUpdatingPositions) 
@@ -115,72 +118,6 @@ View.prototype.draw = function () {
 	
     //Draw on canvas:
 	this.drawBillboards(this.gl);
-    
-    
-    //mat4.translate(mvMatrix, [0, 10, -10]);
-    //drawParticles(gl); 
-    
-    //gl.activeTexture(gl.TEXTURE0);
-    /*
-    //Draw cube:
-    mat4.scale(mvMatrix, [.5, .5, .5]);
-    
-    var quatY = quat4.fromAngleAxis(rotYAngle/3, [1,0,0]);
-	var quatX = quat4.fromAngleAxis(rotYAngle, [0,1,0]);
-	var quatRes = quat4.multiply(quatX, quatY);
-	var rotMatrix = quat4.toMat4(quatRes);
-	mat4.multiply(mvMatrix, rotMatrix);
-    
-	mvPushMatrix();
-		mat4.translate(mvMatrix, [-1, -1, -1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-	    drawParticles(gl);
-    mvPopMatrix();
-    
-    mvPushMatrix();
-		mat4.translate(mvMatrix, [1, -1, -1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-		drawParticles(gl);
-    mvPopMatrix();
-    
-    mvPushMatrix();
-		mat4.translate(mvMatrix, [1, 1, -1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-		drawParticles(gl);
-	mvPopMatrix();
-
-	mvPushMatrix();
-		mat4.translate(mvMatrix, [1, 1, 1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-		drawParticles(gl);
-	mvPopMatrix();
-	
-	mvPushMatrix();
-		mat4.translate(mvMatrix, [-1, -1, 1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-	    drawParticles(gl);
-	mvPopMatrix();
-	
-	mvPushMatrix();
-		mat4.translate(mvMatrix, [-1, 1, 1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-		drawParticles(gl);
-	mvPopMatrix();
-	
-	mvPushMatrix();
-		mat4.translate(mvMatrix, [-1, 1, -1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-		drawParticles(gl);
-	mvPopMatrix();
-	
-	mvPushMatrix();
-		mat4.translate(mvMatrix, [1, -1, 1]);
-		mat4.scale(mvMatrix, [.5, .5, .5]);
-		drawParticles(gl);
-	mvPopMatrix();
-	*/
-    
-   
 }
 
 View.prototype.setupCanvas = function (gl) {
@@ -207,19 +144,6 @@ function startTicking() {
 	tick();
 }
 
-View.prototype.drawParticles = function (gl) {
-	this.currentProgram = this.showParticleShader.useProgram(gl);
-	
-	mvPushMatrix();
-	    mat4.translate(mvMatrix, [0, 0, 1]);
-	    
-		this.showParticlesModel.posTex = this.texCurrentPos;
-		//gl.activeTexture(gl.TEXTURE0);
-		
-	    this.showParticlesModel.draw(gl, this.texVel);
-    mvPopMatrix();
-}
-
 View.prototype.drawBillboards = function (gl) {
 	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
@@ -236,20 +160,20 @@ View.prototype.drawBillboards = function (gl) {
 View.prototype.updateVelocities = function (gl) {
 	this.currentProgram = this.scripts.getProgram("updateVelParticleShader").useProgram(gl);
     
-    //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
+    gl.uniform1f(this.currentProgram.getUniform("timeUniform"), this.deltaTime);
     gl.uniform2f(this.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/mouseX*2.1/gl.viewportWidth - 0.55, 1 - mouseY*1.5/gl.viewportHeight + 0.25 /*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
     gl.uniform1f(this.currentProgram.getUniform("mouseDownUniform"), mouseDown ? -1 : 1);  
     
-    this.FB.bindFBAndAttachTex(gl, this.texVel, this.FB.FB);
+    this.FB.bindFBAndAttachTex(gl, this.texVel);
     this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texVel, this.texCurrentPos);
 }
 
 View.prototype.updatePositions = function (gl) {
 	this.currentProgram = this.scripts.getProgram("updatePosParticleShader").useProgram(gl);
     
-    //gl.uniform1f(currentProgram.getUniform("timeUniform"), elapsedFromStart);
-	
-    this.FB.bindFBAndAttachTex(gl, this.texCurrentPos, this.FB.FB);
+    gl.uniform1f(this.currentProgram.getUniform("timeUniform"), this.deltaTime);
+
+    this.FB.bindFBAndAttachTex(gl, this.texCurrentPos);
     this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texCurrentPos, this.texVel);
 }
 
@@ -257,13 +181,13 @@ View.prototype.drawInitialTextures = function (gl) {
 	this.currentProgram = this.scripts.getProgram("initialParticleShader").useProgram(gl);
 	
 	//Initialize position texture:
-	var elapsedFromStart = (timeNow - startTime)*0.001;
+	//var elapsedFromStart = (timeNow - startTime)*0.001;
 	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -0.5, -0.5);
 	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 1.0);
 	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
 	
 	gl.activeTexture(gl.TEXTURE0);
-	this.FB.bindFBAndAttachTex(gl, this.texCurrentPos, this.FB.FB);
+	this.FB.bindFBAndAttachTex(gl, this.texCurrentPos);
 	
 	this.FBparticlesModel.drawOnFB(gl, this.FB);
 	
@@ -275,7 +199,7 @@ View.prototype.drawInitialTextures = function (gl) {
 	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
 	
 	gl.activeTexture(gl.TEXTURE1);
-	this.FB.bindFBAndAttachTex(gl, this.texVel, this.FB.FB);
+	this.FB.bindFBAndAttachTex(gl, this.texVel);
 
 	this.FBparticlesModel.drawOnFB(gl, this.FB);
 	
@@ -325,18 +249,6 @@ View.prototype.setupUpdateVelShader = function (gl) {
 	gl.activeTexture(gl.TEXTURE0);
 }
 
-function setupParticleShader (gl, shaderProgram) {
-	this.currentProgram = shaderProgram.useProgram(gl);
-	
-	gl.activeTexture(gl.TEXTURE0);
-	gl.uniform1i(this.currentProgram.getUniform("currentUniform"), 0);
-	
-	gl.activeTexture(gl.TEXTURE1);
-	gl.uniform1i(this.currentProgram.getUniform("deltaUniform"), 1);
-	
-	gl.activeTexture(gl.TEXTURE0);
-}
-
 View.prototype.setupFBAndInitTextures = function (gl) {
 	this.FBparticlesModel = new GLFBParticles(gl, 1, this);
 	this.FBparticlesModel.createQuadAndSetup(gl);
@@ -344,8 +256,12 @@ View.prototype.setupFBAndInitTextures = function (gl) {
 	this.FB = new FBO(gl, this.numPointsSqrt);
 	gl.activeTexture(gl.TEXTURE1);
 	this.texVel = createAndSetupTexture(gl, this.FB.widthFB, this.FB.heightFB);
+	//this.FB.bindFBAndAttachTex(gl, this.texVel);
+	
+	//this.FBPos = new FBO(gl, this.numPointsSqrt);
 	gl.activeTexture(gl.TEXTURE0);
 	this.texCurrentPos = createAndSetupTexture(gl, this.FB.widthFB, this.FB.heightFB);
+	//this.FBPos.bindFBAndAttachTex(gl, this.texPos);
 	
 	gl.activeTexture(gl.TEXTURE0);
 }
