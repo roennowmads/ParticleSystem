@@ -10,7 +10,7 @@ void main(void) {
 	vec3 current = vec3(texture2D(uCurrentPos, vTexCoords));
 	vec3 delta = vec3(texture2D(uCurrentVel, vTexCoords));
 
-	vec3 new = current + delta*.05*uTime;
+	vec3 new = current + delta*1.5*uTime;
 
 	gl_FragColor = vec4(new, 1.0);
 }

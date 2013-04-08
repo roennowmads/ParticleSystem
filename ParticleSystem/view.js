@@ -14,7 +14,7 @@ function View() {
 	this.lastDrawTarget;
 	this.currentTexture;
 
-	this.numPointsSqrt = 128;
+	this.numPointsSqrt = document.getElementById("objectCount").value;
 	this.numPoints = this.numPointsSqrt * this.numPointsSqrt;
 
 	this.FB;
@@ -82,7 +82,7 @@ View.prototype.draw = function () {
     
     mat4.identity(mvMatrix);
 
-    mat4.translate(mvMatrix, [0, 0, -3.5]);
+    mat4.translate(mvMatrix, [0, 0, -30.5]);
     var quatY = quat4.fromAngleAxis(0*Math.PI/2, [1,0,0]);
 	var quatX = quat4.fromAngleAxis(this.rotYAngle, [0,1,0]);
 	var quatRes = quat4.multiply(quatX, quatY);
@@ -144,6 +144,7 @@ function startTicking() {
 	tick();
 }
 
+//Draw functions:
 View.prototype.drawBillboards = function (gl) {
 	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
@@ -207,6 +208,7 @@ View.prototype.drawInitialTextures = function (gl) {
 	this.first = false;
 }
 
+//Setup functions:
 View.prototype.setupShowBillboardShader = function (gl) {
 	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
@@ -266,24 +268,6 @@ View.prototype.setupFBAndInitTextures = function (gl) {
 	gl.activeTexture(gl.TEXTURE0);
 }
 
-View.prototype.setupShowParticleShader = function (gl) {
-	this.currentProgram = this.showParticleShader.useProgram(gl);
-	
-	gl.activeTexture(gl.TEXTURE0);
-	gl.uniform1i(this.currentProgram.getUniform("posUniform"), 0);
-	
-	gl.activeTexture(gl.TEXTURE1);
-	gl.uniform1i(this.currentProgram.getUniform("velUniform"), 1);
-	
-	gl.activeTexture(gl.TEXTURE0);
-	
-	this.setMVMatrixUniforms(gl);
-	this.setPMatrixUniform(gl);
-	
-	this.showParticlesModel = new GLShowParticles(gl, 2, this);
-	this.showParticlesModel.generateParticlesAndBuffer(gl, this.numPointsSqrt, this.texCurrentPos);
-}
-
 View.prototype.setupPhongShader = function (gl) {
 	this.currentProgram = this.scripts.getProgram("phongShader").useProgram(gl);
 	gl.uniform3f(this.currentProgram.getUniform("lightingPositionUniform"), 0, 0, 0);
@@ -295,15 +279,6 @@ View.prototype.setupPhongShader = function (gl) {
 	
 	var objectLoader = new FileLoader(1, startTicking, this); 
 	loadMesh(gl, this.cubeModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
-}
-
-View.prototype.loadTextures = function(thisClass) {
-	thisClass.cubeTex = new Texture();
-	thisClass.smokeTex = new Texture();
-
-	var objectLoader = new FileLoader(2, thisClass.setupShadersAndObjects, thisClass); 
-	loadImageToTex(thisClass.gl, thisClass.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/red.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.smokeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader);
 }
 
 View.prototype.setPMatrixUniform = function (gl) {
@@ -319,4 +294,13 @@ View.prototype.setNormalUniforms = function (gl) {
     mat4.toInverseMat3(mvMatrix, normalMatrix);
     mat3.transpose(normalMatrix);
     gl.uniformMatrix3fv(this.currentProgram.getUniform("nMatrixUniform"), false, normalMatrix);
+}
+
+View.prototype.loadTextures = function(thisClass) {
+	thisClass.cubeTex = new Texture();
+	thisClass.smokeTex = new Texture();
+
+	var objectLoader = new FileLoader(2, thisClass.setupShadersAndObjects, thisClass); 
+	loadImageToTex(thisClass.gl, thisClass.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/red.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.smokeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader);
 }

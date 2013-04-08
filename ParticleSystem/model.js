@@ -13,6 +13,15 @@ var view;
 var origWidth;
 var origHeight;
 
+function submit () {
+	var count = document.getElementById("objectCount").value;
+	view.numPointsSqrt = count;
+	view.numPoints = count*count;
+	view.setupFBAndInitTextures(view.gl);
+	view.setupShowBillboardShader (view.gl);
+	view.first = true;
+}
+
 function main () {
 	view = new View();
 
@@ -33,14 +42,7 @@ function main () {
 	document.getElementById("fullscreen").onclick = onFullscreenClick;
 	
 	document.getElementById("objectCount").value = view.numPointsSqrt; 
-	document.getElementById("goButton").onclick = function () {
-		var count = document.getElementById("objectCount").value;
-		view.numPointsSqrt = count;
-		view.numPoints = count*count;
-		view.setupFBAndInitTextures(view.gl);
-		view.setupShowBillboardShader (view.gl);
-		view.first = true;
-	}
+	document.getElementById("goButton").onclick = submit;
 	
 	//Initialize mouse position to the middle of the canvas:
 	mouseX = canvasElm.width/2;
@@ -170,7 +172,6 @@ function onFullscreenClick () {
 }
 
 function fullscreenChange () {
-	console.log("hello");
 	if (document.webkitIsFullScreen || document.mozFullScreenElement) {
 		view.canvas.width = screen.width;
 		view.canvas.height = screen.height;
