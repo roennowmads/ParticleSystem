@@ -82,14 +82,14 @@ View.prototype.draw = function () {
     
     mat4.identity(mvMatrix);
 
-    mat4.translate(mvMatrix, [0, 0, -30.5]);
+    mat4.translate(mvMatrix, [0, 0, -10.5]);
     var quatY = quat4.fromAngleAxis(0*Math.PI/2, [1,0,0]);
 	var quatX = quat4.fromAngleAxis(this.rotYAngle, [0,1,0]);
 	var quatRes = quat4.multiply(quatX, quatY);
 	var rotMatrix = quat4.toMat4(quatRes);
 	mat4.multiply(mvMatrix, rotMatrix);
     
-	this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
+	/*this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
     this.cubeModel.texture = this.cubeTex.texture;	
 	
 	mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
@@ -100,7 +100,7 @@ View.prototype.draw = function () {
 		mat4.scale(mvMatrix, [1, .0625, 1]);
 		this.cubeModel.draw(this.gl);
 		this.gl.enable(this.gl.BLEND);
-	mvPopMatrix();
+	mvPopMatrix();*/
 	
 	
     if (this.first) 
@@ -123,7 +123,7 @@ View.prototype.draw = function () {
 View.prototype.setupCanvas = function (gl) {
 	gl.clearColor(0.1, 0.1, 0.2, 1.0);
 	gl.enable(gl.DEPTH_TEST);
-	//gl.enable(gl.BLEND);
+	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	gl.frontFace(gl.CCW);
 	gl.enable(gl.CULL_FACE);
