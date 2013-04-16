@@ -52,7 +52,7 @@ GLFBParticles.prototype.bindBuffers = function (gl) {
 }
 
 GLFBParticles.prototype.drawOnFB = function (gl, FBO) {
-	gl.bindFramebuffer(gl.FRAMEBUFFER, FBO.FB);
+	FBO.bind(gl);
 	
 	gl.viewport(0, 0, FBO.widthFB, FBO.heightFB);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -69,7 +69,7 @@ GLFBParticles.prototype.drawOnFB = function (gl, FBO) {
 }
 
 GLFBParticles.prototype.drawOnFBMulti = function (gl, FBO, texCurrent, texDelta) {
-	gl.bindFramebuffer(gl.FRAMEBUFFER, FBO.FB);
+	FBO.bind(gl);
 	
 	gl.viewport(0, 0, FBO.widthFB, FBO.heightFB);
     

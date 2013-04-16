@@ -19,6 +19,14 @@ FBO.prototype.createFrameBuffer = function (gl, width, height) {
 FBO.prototype.bindFBAndAttachTex = function (gl, tex) {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, this.FB);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+	//gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+}
+
+FBO.prototype.bind = function (gl) {
+	gl.bindFramebuffer(gl.FRAMEBUFFER, this.FB);
+}
+
+FBO.prototype.unbind = function (gl) {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
