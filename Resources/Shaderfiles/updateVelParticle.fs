@@ -14,6 +14,9 @@ void main(void) {
 	vec3 accelPoint = vec3(texture2D(uCurrentPos, vTexCoords));
 	vec3 deltaDir = normalize(vec3(uMousePos, 0.0) - accelPoint) + vec3(cos(gl_FragCoord.y)*7.0, /*cos(gl_FragCoord.y)*7.0*/ 0.0, 0.0)*0.1;
 	
+	/*vec3 attract1 = normalize(vec3(0.0, 0.0, 0.0) - accelPoint);
+	attract1 = normalize(attract1 + deltaDir);*/
+	
 	//Toggle anti-gravity if mouse button is pressed.
 	deltaDir = uMouseDown*deltaDir;
 
