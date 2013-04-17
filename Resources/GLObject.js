@@ -68,9 +68,8 @@ GLObject.prototype.bufferCTMMesh = function (file, gl, fileLoader) {
 }
 
 GLObject.prototype.bindTexture = function (gl) {
-	//gl.activeTexture(gl.TEXTURE0);
+	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, this.texture);
-	//gl.uniform1i(currentProgram.getUniform("samplerUniform"), 0);
 	this.view.currentTexture = this.texture;
 }
 

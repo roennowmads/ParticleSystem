@@ -52,7 +52,7 @@ GLFBParticles.prototype.bindBuffers = function (gl) {
 }
 
 GLFBParticles.prototype.drawOnFB = function (gl, FBO) {
-	FBO.bind(gl);
+	//FBO.bind(gl);
 	
 	gl.viewport(0, 0, FBO.widthFB, FBO.heightFB);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -69,7 +69,7 @@ GLFBParticles.prototype.drawOnFB = function (gl, FBO) {
 }
 
 GLFBParticles.prototype.drawOnFBMulti = function (gl, FBO, texCurrent, texDelta) {
-	FBO.bind(gl);
+	//FBO.bind(gl);
 	
 	gl.viewport(0, 0, FBO.widthFB, FBO.heightFB);
     
@@ -82,7 +82,7 @@ GLFBParticles.prototype.drawOnFBMulti = function (gl, FBO, texCurrent, texDelta)
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, texDelta);
 	
-	gl.activeTexture(gl.TEXTURE0);
+	//gl.activeTexture(gl.TEXTURE0);
     
     gl.drawArrays(gl.TRIANGLES, 0, this.indexNumItems);
     

@@ -12,15 +12,12 @@ function View() {
 
 	this.lastGLObject;
 	this.lastDrawTarget;
-	this.currentTexture;
 
 	this.numPointsSqrt = document.getElementById("objectCount").value;
 	this.numPoints = this.numPointsSqrt * this.numPointsSqrt;
 
-	this.FB;
-
-	this.texPos; this.texVel;
-	this.texCurrentPos; this.texAccel;
+	this.velFB;
+	this.posFB;
 
 	this.zoomFactor = 1.0;
 	
@@ -119,6 +116,10 @@ View.prototype.draw = function () {
 	
     //Draw on canvas:
 	this.drawBillboards(this.gl);
+	//this.updateVelocities(this.gl, true);
+	
+	//this.posFB.swap();
+	//this.velFB.swap();
 }
 
 View.prototype.setupCanvas = function (gl) {
@@ -150,33 +151,33 @@ View.prototype.drawBillboards = function (gl) {
 	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
 	mvPushMatrix();
-	    mat4.translate(mvMatrix, [0, 0, 1]);
-	    
-		this.showParticlesModel.posTex = this.texCurrentPos;
-		//gl.activeTexture(gl.TEXTURE0);
-		
-	    this.showParticlesModel.drawBillboards(gl, this.smokeTex.texture);
+	    mat4.translate(mvMatrix, [0, 0, 1]);		
+	    this.showParticlesModel.drawBillboards(gl, this.posFB.texFront, this.smokeTex.texture);
     mvPopMatrix();
 }
 
-View.prototype.updateVelocities = function (gl) {
+View.prototype.updateVelocities = function (gl, toCanvas) {
 	this.currentProgram = this.scripts.getProgram("updateVelParticleShader").useProgram(gl);
     
     gl.uniform1f(this.currentProgram.getUniform("timeUniform"), this.deltaTime);
     gl.uniform2f(this.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/mouseX*2.1/gl.viewportWidth - 0.55, 1 - mouseY*1.5/gl.viewportHeight + 0.25 /*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
     gl.uniform1f(this.currentProgram.getUniform("mouseDownUniform"), mouseDown ? -1 : 1);  
     
-    this.FB.bindFBAndAttachTex(gl, this.texVel);
-    this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texVel, this.texCurrentPos);
+	if (!toCanvas)
+		this.velFB.bind(gl, this.velFB.back);
+    this.FBparticlesModel.drawOnFBMulti(gl, this.velFB, this.velFB.texFront, this.posFB.texFront);
+	//this.velFB.unbind(gl);
 }
 
-View.prototype.updatePositions = function (gl) {
+View.prototype.updatePositions = function (gl, toCanvas) {
 	this.currentProgram = this.scripts.getProgram("updatePosParticleShader").useProgram(gl);
     
     gl.uniform1f(this.currentProgram.getUniform("timeUniform"), this.deltaTime);
 
-    this.FB.bindFBAndAttachTex(gl, this.texCurrentPos);
-    this.FBparticlesModel.drawOnFBMulti(gl, this.FB, this.texCurrentPos, this.texVel);
+	if (!toCanvas)
+		this.posFB.bind(gl, this.posFB.back);
+    this.FBparticlesModel.drawOnFBMulti(gl, this.posFB, this.posFB.texFront, this.velFB.texFront);
+	//this.posFB.unbind(gl);
 }
 
 View.prototype.drawInitialTextures = function (gl) {
@@ -188,53 +189,42 @@ View.prototype.drawInitialTextures = function (gl) {
 	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 1.0);
 	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
 	
-	gl.activeTexture(gl.TEXTURE0);
-	this.FB.bindFBAndAttachTex(gl, this.texCurrentPos);
-	
-	this.FBparticlesModel.drawOnFB(gl, this.FB);
-	
+	this.posFB.bind(gl, this.posFB.back);
+	this.FBparticlesModel.drawOnFB(gl, this.posFB);
+	this.posFB.unbind(gl);
 	///
 
 	//Initialize velocity texture:
 	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -.5 , -0.5);
 	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 0.1);
 	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
-	
-	gl.activeTexture(gl.TEXTURE1);
-	this.FB.bindFBAndAttachTex(gl, this.texVel);
 
-	this.FBparticlesModel.drawOnFB(gl, this.FB);
+	this.velFB.bind(gl, this.velFB.back);
+	this.FBparticlesModel.drawOnFB(gl, this.velFB);
+	this.velFB.unbind(gl);
 	
-	gl.activeTexture(gl.TEXTURE0);
 	this.first = false;
+	
 }
 
 //Setup functions:
 View.prototype.setupShowBillboardShader = function (gl) {
 	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
-	gl.activeTexture(gl.TEXTURE0);
 	gl.uniform1i(this.currentProgram.getUniform("posUniform"), 0);
-	
-	gl.activeTexture(gl.TEXTURE2);
-	gl.uniform1i(this.currentProgram.getUniform("billUniform"), 2);
-	
-	gl.activeTexture(gl.TEXTURE0);
+	gl.uniform1i(this.currentProgram.getUniform("billUniform"), 1);
 	
 	this.setMVMatrixUniforms(gl);
 	this.setPMatrixUniform(gl);
 	
 	this.showParticlesModel = new GLShowParticles(gl, 2, this);
-	this.showParticlesModel.generateParticlesAndBuffer(gl, this.numPointsSqrt, this.texCurrentPos);
+	this.showParticlesModel.generateParticlesAndBuffer(gl, this.numPointsSqrt);
 }
 
 View.prototype.setupUpdatePosShader = function (gl) {
 	this.currentProgram = this.scripts.getProgram("updatePosParticleShader").useProgram(gl);
 	
-	gl.activeTexture(gl.TEXTURE0);
 	gl.uniform1i(this.currentProgram.getUniform("currentPosUniform"), 0);
-	
-	gl.activeTexture(gl.TEXTURE1);
 	gl.uniform1i(this.currentProgram.getUniform("currentVelUniform"), 1);
 	
 	gl.activeTexture(gl.TEXTURE0);
@@ -243,30 +233,16 @@ View.prototype.setupUpdatePosShader = function (gl) {
 View.prototype.setupUpdateVelShader = function (gl) {
 	this.currentProgram = this.scripts.getProgram("updateVelParticleShader").useProgram(gl);
 	
-	gl.activeTexture(gl.TEXTURE0);
 	gl.uniform1i(this.currentProgram.getUniform("currentVelUniform"), 0);
-	
-	gl.activeTexture(gl.TEXTURE1);
 	gl.uniform1i(this.currentProgram.getUniform("currentPosUniform"), 1);
-	
-	gl.activeTexture(gl.TEXTURE0);
 }
 
 View.prototype.setupFBAndInitTextures = function (gl) {
 	this.FBparticlesModel = new GLFBParticles(gl, 1, this);
 	this.FBparticlesModel.createQuadAndSetup(gl);
 	
-	this.FB = new FBO(gl, this.numPointsSqrt);
-	gl.activeTexture(gl.TEXTURE1);
-	this.texVel = createAndSetupTexture(gl, this.FB.widthFB, this.FB.heightFB);
-	//this.FB.bindFBAndAttachTex(gl, this.texVel);
-	
-	//this.FBPos = new FBO(gl, this.numPointsSqrt);
-	gl.activeTexture(gl.TEXTURE0);
-	this.texCurrentPos = createAndSetupTexture(gl, this.FB.widthFB, this.FB.heightFB);
-	//this.FBPos.bindFBAndAttachTex(gl, this.texPos);
-	
-	gl.activeTexture(gl.TEXTURE0);
+	this.velFB = new FBO(gl, this.numPointsSqrt);
+	this.posFB = new FBO(gl, this.numPointsSqrt);
 }
 
 View.prototype.setupPhongShader = function (gl) {

@@ -2,7 +2,6 @@
 
 function GLShowParticles (gl, id, view) {
 	this.vertexCoordsBuffer;
-	this.posTex;
 	this.indexNumItems = 0;
 	this.identifier;
 	this.itemSize;
@@ -10,7 +9,7 @@ function GLShowParticles (gl, id, view) {
 	this.view = view;
 }
 
-GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCountSqrt, tex) {	
+GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCountSqrt) {	
 	this.vertexCoordsBuffer = gl.createBuffer();
 	
 	this.itemSize = 2;
@@ -37,7 +36,6 @@ GLShowParticles.prototype.generateParticlesAndBuffer = function (gl, particleCou
 	gl.bufferData(gl.ARRAY_BUFFER, vertexCoords, gl.STATIC_DRAW);
 	
 	vertexCoords = null;
-	this.posTex = tex;
 }
 
 GLShowParticles.prototype.bindBuffers = function (gl) {
@@ -45,7 +43,7 @@ GLShowParticles.prototype.bindBuffers = function (gl) {
 	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("vertexCoordsAttribute"), this.itemSize, gl.FLOAT, false, 0, 0);
 }
 
-GLShowParticles.prototype.drawBillboards = function (gl, billboardTex) {
+GLShowParticles.prototype.drawBillboards = function (gl, posTex, billboardTex) {
 	//if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.CANVAS) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
 		this.bindBuffers(gl);
 
@@ -54,12 +52,12 @@ GLShowParticles.prototype.drawBillboards = function (gl, billboardTex) {
 	
 	//Bind texture to read vertex positions from:
 	gl.activeTexture(gl.TEXTURE0);
-	gl.bindTexture(gl.TEXTURE_2D, this.posTex);
+	gl.bindTexture(gl.TEXTURE_2D, posTex);
 	
-	gl.activeTexture(gl.TEXTURE2);
+	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, billboardTex);
 	
-	gl.activeTexture(gl.TEXTURE0);
+	//gl.activeTexture(gl.TEXTURE0);
 	
 	this.view.setMVMatrixUniforms(gl);
 	gl.drawArrays(gl.POINTS, 0, this.indexNumItems)

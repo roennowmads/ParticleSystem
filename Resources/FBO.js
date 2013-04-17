@@ -1,36 +1,43 @@
 "use strict";
 
 function FBO (gl, width) {
-	this.widthFB;
-	this.heightFB;
-	this.FB = this.createFrameBuffer(gl, width, width);
+	this.widthFB = width;
+	this.heightFB = width;
+	
+	/*this.buffer1 = gl.createFramebuffer();
+	this.texBack = this.createAndSetupTexture (gl);
+	this.bindFBAndAttachTex(gl, this.buffer1, this.texBack);*/
+	
+	this.buffer2 = gl.createFramebuffer();
+	this.texFront = this.createAndSetupTexture (gl);
+	this.bindFBAndAttachTex(gl, this.buffer2, this.texFront);
+	
+	//this.front = this.buffer1;
+	this.back = this.buffer2;
 }
 
-FBO.prototype.createFrameBuffer = function (gl, width, height) {
-	var FB = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, FB);
-    this.widthFB = width;
-    this.heightFB = height;
-    
-    return FB;
-    //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-}
-
-FBO.prototype.bindFBAndAttachTex = function (gl, tex) {
-	gl.bindFramebuffer(gl.FRAMEBUFFER, this.FB);
+FBO.prototype.bindFBAndAttachTex = function (gl, buffer, tex) {
+	gl.bindFramebuffer(gl.FRAMEBUFFER, buffer);
 	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
-	//gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
-FBO.prototype.bind = function (gl) {
-	gl.bindFramebuffer(gl.FRAMEBUFFER, this.FB);
+FBO.prototype.bind = function (gl, buffer) {
+	gl.bindFramebuffer(gl.FRAMEBUFFER, buffer);
 }
 
 FBO.prototype.unbind = function (gl) {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
-function createAndSetupTexture (gl, width, height) {
+FBO.prototype.swap = function (gl) {
+	console.log("swap");
+	var temp = this.front;
+	this.front = this.back;
+	this.back = temp;
+}
+
+FBO.prototype.createAndSetupTexture = function (gl) {
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	
@@ -44,7 +51,7 @@ function createAndSetupTexture (gl, width, height) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 	
 	// make the texture the same size as the image
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.FLOAT, null);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, this.widthFB, this.heightFB, 0, gl.RGB, gl.FLOAT, null);
 	
 	return texture;
 }
