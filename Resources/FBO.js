@@ -4,15 +4,15 @@ function FBO (gl, width) {
 	this.widthFB = width;
 	this.heightFB = width;
 	
-	/*this.buffer1 = gl.createFramebuffer();
+	this.buffer1 = gl.createFramebuffer();
 	this.texBack = this.createAndSetupTexture (gl);
-	this.bindFBAndAttachTex(gl, this.buffer1, this.texBack);*/
+	this.bindFBAndAttachTex(gl, this.buffer1, this.texBack);
 	
 	this.buffer2 = gl.createFramebuffer();
 	this.texFront = this.createAndSetupTexture (gl);
 	this.bindFBAndAttachTex(gl, this.buffer2, this.texFront);
 	
-	//this.front = this.buffer1;
+	this.front = this.buffer1;
 	this.back = this.buffer2;
 }
 
@@ -31,7 +31,6 @@ FBO.prototype.unbind = function (gl) {
 }
 
 FBO.prototype.swap = function (gl) {
-	console.log("swap");
 	var temp = this.front;
 	this.front = this.back;
 	this.back = temp;

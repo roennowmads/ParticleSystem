@@ -4,6 +4,15 @@ function View() {
 	this.canvas;
 	this.gl;
 	this.cubeModel; this.planeModel; this.FBparticlesModel; this.showParticlesModel;
+	
+	this.door; this.doorHandle; this.frontWallLogs; this.insideCottage; this.interiorFloor; this.leftWallLogs; 
+	this.rightWallMortar; this.patio; this.pillars; this.rightWallLogs; this.roofPanel1; this.roofPanel2; 
+	this.roofAccessories; this.upperWall; this.windowFrames; this.windows; 
+	
+	this.models = new Array();
+	this.textures = new Array();
+	
+	
 	this.cubeTex; this.planeTex;
 	this.rotYAngle = 0;
 	this.deltaTime = 0;
@@ -88,17 +97,22 @@ View.prototype.draw = function () {
     
 	mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
 	
-	/*this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
-    this.cubeModel.texture = this.cubeTex.texture;	
+	this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
 	
 	
 	mvPushMatrix();
 		this.gl.disable(this.gl.BLEND);
 		mat4.translate(mvMatrix, [0.0,-.5,0.0]);
-		mat4.scale(mvMatrix, [1, .0625, 1]);
-		this.cubeModel.draw(this.gl);
+		mat4.scale(mvMatrix, [.001, .001, .001]);
+		//mat4.scale(mvMatrix, [1, .0625, 1]);
+		
+		for (var i = 0; i < this.models.length; i++) {
+			this.models[i].texture = this.cubeTex.texture;	
+			this.models[i].draw(this.gl);
+		}
+		//this.cubeModel.draw(this.gl);
 		this.gl.enable(this.gl.BLEND);
-	mvPopMatrix();*/
+	mvPopMatrix();
 	
 	
     if (this.first) 
@@ -118,8 +132,8 @@ View.prototype.draw = function () {
 	this.drawBillboards(this.gl);
 	//this.updateVelocities(this.gl, true);
 	
-	//this.posFB.swap();
-	//this.velFB.swap();
+	this.posFB.swap();
+	this.velFB.swap();
 }
 
 View.prototype.setupCanvas = function (gl) {
@@ -152,7 +166,7 @@ View.prototype.drawBillboards = function (gl) {
 	
 	mvPushMatrix();
 	    mat4.translate(mvMatrix, [0, 0, 1]);		
-	    this.showParticlesModel.drawBillboards(gl, this.posFB.texFront, this.smokeTex.texture);
+	    this.showParticlesModel.drawBillboards(gl, this.posFB.texBack, this.smokeTex.texture);
     mvPopMatrix();
 }
 
@@ -204,6 +218,8 @@ View.prototype.drawInitialTextures = function (gl) {
 	this.velFB.unbind(gl);
 	
 	this.first = false;
+	this.posFB.swap();
+	this.velFB.swap();
 	
 }
 
@@ -254,8 +270,48 @@ View.prototype.setupPhongShader = function (gl) {
 	
 	this.cubeModel = new GLObject(gl, this);
 	
-	var objectLoader = new FileLoader(1, startTicking, this); 
-	loadMesh(gl, this.cubeModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
+	this.door = new GLObject(gl, this);
+	this.doorHandle = new GLObject(gl, this);
+	this.frontWallLogs = new GLObject(gl, this);
+	this.backWall = new GLObject(gl, this);
+	this.insideCottage = new GLObject(gl, this);
+	this.interiorFloor = new GLObject(gl, this);
+	this.leftWallLogs = new GLObject(gl, this);
+	this.rightWallMortar = new GLObject(gl, this);
+	this.patio = new GLObject(gl, this);
+	this.pillars = new GLObject(gl, this);
+	this.rightWallLogs = new GLObject(gl, this);
+	this.roofPanel1 = new GLObject(gl, this);
+	this.roofPanel2 = new GLObject(gl, this);
+	this.roofAccessories = new GLObject(gl, this);
+	this.upperWall = new GLObject(gl, this);
+	this.upperWallBack = new GLObject(gl, this);
+	this.windowFrames = new GLObject(gl, this);
+	this.windows = new GLObject(gl, this);
+	
+	this.models.push(this.door,/* this.doorHandle, this.insideCottage,*/ this.interiorFloor, this.frontWallLogs, this.backWall, this.leftWallLogs, 
+	this.rightWallMortar, this.patio, this.pillars, this.rightWallLogs, this.roofPanel1, this.roofPanel2, this.roofAccessories, this.upperWall, this.upperWallBack,
+	this.windowFrames, this.windows); 
+	
+	var objectLoader = new FileLoader(16, startTicking, this); 
+	loadMesh(gl, this.door, "/ParticleSystem/ParticleSystem/Resources/x-models/door.ctm", objectLoader);
+	/*loadMesh(gl, this.doorHandle, "/ParticleSystem/ParticleSystem/Resources/x-models/House1.ctm", objectLoader);	
+	loadMesh(gl, this.insideCottage, "/ParticleSystem/ParticleSystem/Resources/x-models/House1.ctm", objectLoader);*/
+	loadMesh(gl, this.interiorFloor, "/ParticleSystem/ParticleSystem/Resources/x-models/insideFloor.ctm", objectLoader);
+	loadMesh(gl, this.rightWallMortar, "/ParticleSystem/ParticleSystem/Resources/x-models/rightWallMortar.ctm", objectLoader);
+	loadMesh(gl, this.frontWallLogs, "/ParticleSystem/ParticleSystem/Resources/x-models/frontWall.ctm", objectLoader);
+	loadMesh(gl, this.backWall, "/ParticleSystem/ParticleSystem/Resources/x-models/backWall.ctm", objectLoader);
+	loadMesh(gl, this.leftWallLogs, "/ParticleSystem/ParticleSystem/Resources/x-models/leftWall.ctm", objectLoader);
+	loadMesh(gl, this.patio, "/ParticleSystem/ParticleSystem/Resources/x-models/patio.ctm", objectLoader);
+	loadMesh(gl, this.pillars, "/ParticleSystem/ParticleSystem/Resources/x-models/pillars.ctm", objectLoader);
+	loadMesh(gl, this.rightWallLogs, "/ParticleSystem/ParticleSystem/Resources/x-models/rightWall.ctm", objectLoader);
+	loadMesh(gl, this.roofPanel1, "/ParticleSystem/ParticleSystem/Resources/x-models/roofPanel.ctm", objectLoader);
+	loadMesh(gl, this.roofPanel2, "/ParticleSystem/ParticleSystem/Resources/x-models/roofPanel2.ctm", objectLoader);
+	loadMesh(gl, this.roofAccessories, "/ParticleSystem/ParticleSystem/Resources/x-models/roofAccessories.ctm", objectLoader);
+	loadMesh(gl, this.upperWall, "/ParticleSystem/ParticleSystem/Resources/x-models/frontRoofWall.ctm", objectLoader);
+	loadMesh(gl, this.upperWallBack, "/ParticleSystem/ParticleSystem/Resources/x-models/backRoofWall.ctm", objectLoader);
+	loadMesh(gl, this.windowFrames, "/ParticleSystem/ParticleSystem/Resources/x-models/windowFrames.ctm", objectLoader);
+	loadMesh(gl, this.windows, "/ParticleSystem/ParticleSystem/Resources/x-models/windows.ctm", objectLoader);
 }
 
 View.prototype.setPMatrixUniform = function (gl) {
@@ -276,8 +332,52 @@ View.prototype.setNormalUniforms = function (gl) {
 View.prototype.loadTextures = function(thisClass) {
 	thisClass.cubeTex = new Texture();
 	thisClass.smokeTex = new Texture();
-
-	var objectLoader = new FileLoader(2, thisClass.setupShadersAndObjects, thisClass); 
-	loadImageToTex(thisClass.gl, thisClass.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/red.png", objectLoader);
+	thisClass.leftWallTex = new Texture();
+	thisClass.frontWallTex = new Texture();
+	thisClass.rightWallTex = new Texture();
+	thisClass.rightWallMortarTex = new Texture();
+	thisClass.backWallTex = new Texture();
+	thisClass.upperWallTex = new Texture();
+	thisClass.upperWallBackTex = new Texture();
+	thisClass.roofTex = new Texture();
+	thisClass.roofAccessoriesTex = new Texture();
+	thisClass.pillarsTex = new Texture();
+	thisClass.patioTex = new Texture();
+	thisClass.doorTex = new Texture();
+	thisClass.windowFramesTex = new Texture();
+	thisClass.windowsTex = new Texture();
+	
+	thisClass.textures.push(
+		thisClass.leftWallTex, 
+		thisClass.frontWallTex, 
+		thisClass.rightWallTex,
+		thisClass.rightWallMortarTex,
+		thisClass.backWallTex,
+		thisClass.upperWallTex,
+		thisClass.upperWallBackTex,
+		thisClass.roofTex,
+		thisClass.roofAccessoriesTex,
+		thisClass.pillarsTex,
+		thisClass.patioTex,
+		thisClass.doorTex,
+		thisClass.windowFramesTex,
+		thisClass.windowsTex
+	); 
+	
+	var objectLoader = new FileLoader(14, thisClass.setupShadersAndObjects, thisClass); 
+	loadImageToTex(thisClass.gl, thisClass.leftWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/LeftWallLogs_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.frontWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/FrontWallLogs_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.rightWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/RightWallLogs_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.rightWallMortarTex, "/ParticleSystem/ParticleSystem/Resources/x-images/Mortar_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.backWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/Mortar_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.upperWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/UpperWall_color.png", objectLoader);
+	//loadImageToTex(thisClass.gl, thisClass.upperWallBack, "/ParticleSystem/ParticleSystem/Resources/x-images/UpperWall_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.roofTex, "/ParticleSystem/ParticleSystem/Resources/x-images/Roof_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.roofAccessoriesTex, "/ParticleSystem/ParticleSystem/Resources/x-images/RoofAccessories_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.pillarsTex, "/ParticleSystem/ParticleSystem/Resources/x-images/Pillars_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.patioTex, "/ParticleSystem/ParticleSystem/Resources/x-images/Patio_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.doorTex, "/ParticleSystem/ParticleSystem/Resources/x-images/Door_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.windowFramesTex, "/ParticleSystem/ParticleSystem/Resources/x-images/WindowFrames_color.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.windowsTex, "/ParticleSystem/ParticleSystem/Resources/x-images/Windows_color.png", objectLoader);
 	loadImageToTex(thisClass.gl, thisClass.smokeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader);
 }

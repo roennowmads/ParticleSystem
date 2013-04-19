@@ -41,6 +41,9 @@ GLObject.prototype.handleLoadedCTMFile = function (resp, gl, fileLoader) {
 GLObject.prototype.bufferCTMMesh = function (file, gl, fileLoader) {		
 	var verticesArray = file.body.vertices;
 	var indicesArray = new Uint16Array(file.body.indices);
+	
+	console.log(file);
+	
 	var normalsArray = file.body.normals;
 	var texCoordsArray = file.body.uvMaps[0].uv;
 	this.indexNumItems = file.body.indices.length;
