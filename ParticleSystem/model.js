@@ -58,11 +58,11 @@ function loadMesh (gl, model, meshLoc, objectLoader) {
 	model.loadMeshFromCTMFile(meshLoc, gl, objectLoader);
 }
 
-function loadImageToTex (gl, textureObj, imgLoc, objectLoader) {
+function loadImageToTex (gl, textureObj, imgLoc, objectLoader, notMipmap) {
 	var img = new Image();
 	img.src = imgLoc;
 	img.onload = function () {
-		textureObj.texture = new createTexture(img, gl, objectLoader);
+		textureObj.texture = new createTexture(img, gl, objectLoader, notMipmap);
 	}
 }
 

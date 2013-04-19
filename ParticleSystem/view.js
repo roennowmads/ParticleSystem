@@ -292,9 +292,9 @@ View.prototype.setupPhongShader = function (gl) {
 	
 	this.models.push(this.leftWallLogs, this.frontWallLogs, this.rightWallLogs, this.rightWallMortar, this.backWall, 
 	this.upperWall, this.upperWallBack, this.roofPanel1, this.roofPanel2, this.roofAccessories, this.pillars, this.patio, 
-	this.door, this.windowFrames, this.windows/*, this.interiorFloor*/); 
+	this.door, this.windowFrames/*, this.windows*//*, this.interiorFloor*/); 
 	
-	var objectLoader = new FileLoader(15, startTicking, this); 
+	var objectLoader = new FileLoader(14, startTicking, this); 
 	loadMesh(gl, this.door, "/ParticleSystem/ParticleSystem/Resources/x-models/door.ctm", objectLoader);
 	//loadMesh(gl, this.interiorFloor, "/ParticleSystem/ParticleSystem/Resources/x-models/insideFloor.ctm", objectLoader);
 	loadMesh(gl, this.rightWallMortar, "/ParticleSystem/ParticleSystem/Resources/x-models/rightWallMortar.ctm", objectLoader);
@@ -310,7 +310,7 @@ View.prototype.setupPhongShader = function (gl) {
 	loadMesh(gl, this.upperWall, "/ParticleSystem/ParticleSystem/Resources/x-models/frontRoofWall.ctm", objectLoader);
 	loadMesh(gl, this.upperWallBack, "/ParticleSystem/ParticleSystem/Resources/x-models/backRoofWall.ctm", objectLoader);
 	loadMesh(gl, this.windowFrames, "/ParticleSystem/ParticleSystem/Resources/x-models/windowFrames.ctm", objectLoader);
-	loadMesh(gl, this.windows, "/ParticleSystem/ParticleSystem/Resources/x-models/windows.ctm", objectLoader);
+	//loadMesh(gl, this.windows, "/ParticleSystem/ParticleSystem/Resources/x-models/windows.ctm", objectLoader);
 }
 
 View.prototype.setPMatrixUniform = function (gl) {
@@ -359,25 +359,25 @@ View.prototype.loadTextures = function(thisClass) {
 		thisClass.pillarsTex,
 		thisClass.patioTex,
 		thisClass.doorTex,
-		thisClass.windowFramesTex,
-		thisClass.windowsTex
+		thisClass.windowFramesTex
+		/*thisClass.windowsTex*/
 	); 
 	
-	var objectLoader = new FileLoader(15, thisClass.setupShadersAndObjects, thisClass); 
-	loadImageToTex(thisClass.gl, thisClass.leftWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/LeftWallLogs_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.frontWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/FrontWallLogs_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.rightWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/RightWallLogs_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.rightWallMortarTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Mortar_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.backWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Mortar_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.upperWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/UpperWall_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.upperWallBackTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/UpperWall_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.roofTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Roof_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.roofAccessoriesTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/RoofAccessories_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.pillarsTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Pillars_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.patioTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Patio_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.doorTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Door_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.windowFramesTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/WindowFrames_color.png", objectLoader);
-	loadImageToTex(thisClass.gl, thisClass.windowsTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Windows_color.png", objectLoader);
+	var objectLoader = new FileLoader(14, thisClass.setupShadersAndObjects, thisClass); 
+	loadImageToTex(thisClass.gl, thisClass.leftWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/LeftWallLogs_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.frontWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/FrontWallLogs_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.rightWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/RightWallLogs_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.rightWallMortarTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Mortar_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.backWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Mortar_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.upperWallTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/UpperWall_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.upperWallBackTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/UpperWall_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.roofTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Roof_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.roofAccessoriesTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/RoofAccessories_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.pillarsTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Pillars_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.patioTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Patio_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.doorTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Door_color.jpg", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.windowFramesTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/WindowFrames_color.jpg", objectLoader);
+	//loadImageToTex(thisClass.gl, thisClass.windowsTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Windows_color.jpg", objectLoader);
 	
-	loadImageToTex(thisClass.gl, thisClass.smokeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader);
+	loadImageToTex(thisClass.gl, thisClass.smokeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader, true);
 }
