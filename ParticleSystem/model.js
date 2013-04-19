@@ -26,6 +26,7 @@ function main () {
 	view = new View();
 
 	document.onmousemove = onMouseMove;
+	document.onmousewheel = onMouseWheel;
 	document.onkeydown = onKeyDown;
 	
 	var canvasElm = document.getElementById("canvas");
@@ -89,7 +90,7 @@ function onKeyDown (e) {
 		view.isUpdatingPositions = !view.isUpdatingPositions;
 		var posInput = document.getElementById("posInput");
 		posInput.checked = view.isUpdatingPositions;
-		view.zoomFactor = 1.0;
+		//view.zoomFactor = 1.0;
 		view.rotYAngle = 0.0;
 		break;
 	case Keys.LEFT:
@@ -136,6 +137,19 @@ function onMouseMove(e) {
 			mouseY = e.offsetY;//clientY;//e.movementY || e.webkitMovementY || e.mozMovementX || 0;
 		}
 	}
+}
+
+function onMouseWheel(e) {
+	if (!view.isUpdatingPositions) {
+		if (e.wheelDeltaY > 0) {
+			view.zoomFactor *= 1.01;
+		}
+		else if (e.wheelDeltaY < 0) {
+			view.zoomFactor *= 0.99;
+		}
+	}
+	e.preventDefault();
+	
 }
 
 function toggleVelocities () {
