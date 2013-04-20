@@ -88,8 +88,8 @@ GLObject.prototype.bindBuffers = function (gl) {
 }
 
 GLObject.prototype.draw = function (gl) {	
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+	//gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	//gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	
 	//if (this.view.currentTexture != this.texture)		//Optimizes by not binding the texture, if the same texture is already bound.
 		this.bindTexture(gl);

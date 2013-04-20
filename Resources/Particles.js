@@ -77,11 +77,11 @@ Particles.prototype.updateVelocities = function (gl, toCanvas) {
     gl.uniform1f(this.view.currentProgram.getUniform("timeUniform"), this.view.deltaTime);
 	
 	if (this.mouseControlled) {
-		gl.uniform2f(this.view.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/3*mouseX/gl.viewportWidth - 1, mouseY*2/gl.viewportHeight - 1/*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
+		gl.uniform2f(this.view.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/3*mouseX/gl.viewportWidth - 1, mouseY*3/gl.viewportHeight - 1/*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
 		gl.uniform1f(this.view.currentProgram.getUniform("mouseDownUniform"), mouseDown ? -1 : 1);  
     }
 	else {
-		gl.uniform2f(this.view.currentProgram.getUniform("mousePosUniform"), 0.5, 0.5);
+		gl.uniform2f(this.view.currentProgram.getUniform("mousePosUniform"), 0.5, 2);
 		gl.uniform1f(this.view.currentProgram.getUniform("mouseDownUniform"), 1);  
 	}
 	if (!toCanvas)

@@ -39,6 +39,7 @@ View.prototype.initView = function () {
 	this.scripts.addProgram("initialParticleShader", "FBTexture", "initialParticle");
 	this.scripts.addProgram("updateVelParticleShader", "FBTexture", "updateVelParticle");
 	this.scripts.addProgram("updatePosParticleShader", "FBTexture", "updatePosParticle");
+	this.scripts.addProgram("shadowShader", "FBTexture", "FBTexture");
 	this.scripts.addProgram("phongShader", "phong", "phong");
 	
 	//Downloads scripts and calls loadTextures when done, which calls setupShadersAndObjects when done:
@@ -48,6 +49,7 @@ View.prototype.initView = function () {
 View.prototype.setupShadersAndObjects = function (thisClass) {	
 	thisClass.particles = new Particles(thisClass, thisClass.smokeTex, true);
 	thisClass.particles2 = new Particles(thisClass, thisClass.house.textures[0], false);
+	thisClass.shadowFBinit(thisClass.gl);
 
 	thisClass.setupCanvas(thisClass.gl);
 	
@@ -78,12 +80,31 @@ View.prototype.draw = function () {
     mat4.identity(mvMatrix);
     mat4.translate(mvMatrix, [0, 0, -3.5]);
 	
+	this.shadowFB.unbind(this.gl);
+	this.gl.viewport(0, 0, this.gl.viewportWidth, this.gl.viewportHeight);
 	this.drawHouseAndGround(this.gl);
-	this.particles.draw(this.gl);
 	
-	//mat4.scale(mvMatrix, [0.5, 0.5, 0.5]);
-	//mat4.translate(mvMatrix, [0.0, 0.5, 0.0]);
-	this.particles2.draw(this.gl);
+	mat4.translate(mvMatrix, [0, 1.0, 0]);
+	
+	var quatY = quat4.fromAngleAxis(-Math.PI*0.4, [1,0,0]);
+	var quatX = quat4.fromAngleAxis(Math.PI, [0,1,0]);
+	var quatRes = quat4.multiply(quatX, quatY);
+	var rotMatrix = quat4.toMat4(quatRes);
+	mat4.multiply(mvMatrix, rotMatrix);
+	
+	this.shadowFB.bind(this.gl, this.shadowFB.front);
+	this.gl.viewport(0, 0, this.shadowFB.widthFB, this.shadowFB.widthFB);
+	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+	this.drawHouseAndGround(this.gl);
+	
+	this.currentProgram = this.scripts.getProgram("shadowShader").useProgram(this.gl);
+	this.shadowFB.unbind(this.gl);
+	this.particles.FBparticlesModel.drawOnFBMulti(this.gl, this.shadowFB, this.shadowFB.texBack, this.shadowFB.texBack);
+	
+	//this.particles.FBparticlesModel.drawOnFB(this.gl, this.shadowFB);
+	//this.particles.draw(this.gl);
+	
+	//this.particles2.draw(this.gl);
 }
 
 View.prototype.setupCanvas = function (gl) {
@@ -108,6 +129,11 @@ function tick () {
 
 function startTicking() {
 	tick();
+}
+
+View.prototype.shadowFBinit = function (gl) {
+	//this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
+	this.shadowFB = new FBO(gl, 256);
 }
 
 View.prototype.drawHouseAndGround = function (gl) {
@@ -155,6 +181,11 @@ View.prototype.setupPhongShader = function (gl) {
 	this.setPMatrixUniform(gl);
 	this.setNormalUniforms(gl); 
 }
+
+View.prototype.setupShadowShader = function (gl) {
+	this.currentProgram = this.scripts.getProgram("shadowShader").useProgram(gl);
+	gl.uniform1i(this.view.currentProgram.getUniform("textureUniform"), 0);
+} 
 
 View.prototype.setPMatrixUniform = function (gl) {
 	gl.uniformMatrix4fv(this.currentProgram.getUniform("pMatrixUniform"), false, pMatrix);

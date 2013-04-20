@@ -19,7 +19,7 @@ function submit () {
 	view.numPoints = count*count;
 	view.particles.setupFBAndInitTextures(view.gl);
 	view.particles.setupShowBillboardShader(view.gl);
-	view.first = true;
+	view.particles.first = true;
 }
 
 function main () {
