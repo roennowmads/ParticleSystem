@@ -20,7 +20,6 @@ function View() {
 	this.numPointsSqrt = document.getElementById("objectCount").value;
 	this.numPoints = this.numPointsSqrt * this.numPointsSqrt;
 	
-	this.first = true;
 	this.isUpdatingVelocities = true;
 	this.isUpdatingPositions = true;
 	
@@ -47,11 +46,13 @@ View.prototype.initView = function () {
 }
 
 View.prototype.setupShadersAndObjects = function (thisClass) {	
-	thisClass.particles = new Particles(thisClass, thisClass.smokeTex);
+	thisClass.particles = new Particles(thisClass, thisClass.smokeTex, true);
+	thisClass.particles2 = new Particles(thisClass, thisClass.house.textures[0], false);
 
 	thisClass.setupCanvas(thisClass.gl);
 	
 	thisClass.particles.setup(thisClass.gl);
+	thisClass.particles2.setup(thisClass.gl);
 	thisClass.setupPhongShader(thisClass.gl);
 	thisClass.loadModels(thisClass.gl);
 }
@@ -79,6 +80,10 @@ View.prototype.draw = function () {
 	
 	this.drawHouseAndGround(this.gl);
 	this.particles.draw(this.gl);
+	
+	//mat4.scale(mvMatrix, [0.5, 0.5, 0.5]);
+	//mat4.translate(mvMatrix, [0.0, 0.5, 0.0]);
+	this.particles2.draw(this.gl);
 }
 
 View.prototype.setupCanvas = function (gl) {

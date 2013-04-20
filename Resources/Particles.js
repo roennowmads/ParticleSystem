@@ -1,17 +1,19 @@
 "use strict";
 
-function Particles (view, texture) {
+function Particles (view, texture, mouseControlled) {
 	this.view = view;
 	this.texture = texture;
 	this.FBparticlesModel; 
 	this.showParticlesModel;
 	this.velFB;
 	this.posFB;
+	this.first = true;
+	this.mouseControlled = mouseControlled;
 }
 
 
 Particles.prototype.draw = function (gl) {
-	if (this.view.first) 
+	if (this.first) 
     	this.drawInitialTextures(gl);
     
     var elapsedFromStart = (timeNow - startTime)*0.001;
@@ -73,9 +75,15 @@ Particles.prototype.updateVelocities = function (gl, toCanvas) {
 	this.view.currentProgram = this.view.scripts.getProgram("updateVelParticleShader").useProgram(gl);
     
     gl.uniform1f(this.view.currentProgram.getUniform("timeUniform"), this.view.deltaTime);
-    gl.uniform2f(this.view.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/3*mouseX/gl.viewportWidth - 1, mouseY*2/gl.viewportHeight - 1/*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
-    gl.uniform1f(this.view.currentProgram.getUniform("mouseDownUniform"), mouseDown ? -1 : 1);  
-    
+	
+	if (this.mouseControlled) {
+		gl.uniform2f(this.view.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/3*mouseX/gl.viewportWidth - 1, mouseY*2/gl.viewportHeight - 1/*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
+		gl.uniform1f(this.view.currentProgram.getUniform("mouseDownUniform"), mouseDown ? -1 : 1);  
+    }
+	else {
+		gl.uniform2f(this.view.currentProgram.getUniform("mousePosUniform"), 0.5, 0.5);
+		gl.uniform1f(this.view.currentProgram.getUniform("mouseDownUniform"), 1);  
+	}
 	if (!toCanvas)
 		this.velFB.bind(gl, this.velFB.back);
     this.FBparticlesModel.drawOnFBMulti(gl, this.velFB, this.velFB.texFront, this.posFB.texFront);
@@ -116,7 +124,7 @@ Particles.prototype.drawInitialTextures = function (gl) {
 	this.FBparticlesModel.drawOnFB(gl, this.velFB);
 	this.velFB.unbind(gl);
 	
-	this.view.first = false;
+	this.first = false;
 	this.posFB.swap();
 	this.velFB.swap();
 	
