@@ -59,8 +59,6 @@ GLFBParticles.prototype.drawOnFB = function (gl, FBO) {
     
     //if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.FRAMEBUFFER)
     	this.bindBuffers(gl);
-    	
-    //gl.bindTexture(gl.TEXTURE_2D, this.texture);
     
     gl.drawArrays(gl.TRIANGLES, 0, this.indexNumItems);
     

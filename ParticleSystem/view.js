@@ -3,7 +3,7 @@
 function View() {
 	this.canvas;
 	this.gl;
-	this.cubeModel; this.planeModel; this.FBparticlesModel; this.showParticlesModel;
+	this.cubeModel;
 	
 	this.models = new Array();
 	this.textures = new Array();
@@ -13,16 +13,13 @@ function View() {
 	this.rotYAngle = 0;
 	this.deltaTime = 0;
 
-	this.DRAWTARGETS = { CANVAS : 0, FRAMEBUFFER : 1 };
+	//this.DRAWTARGETS = { CANVAS : 0, FRAMEBUFFER : 1 };
 
 	this.lastGLObject;
 	this.lastDrawTarget;
 
 	this.numPointsSqrt = document.getElementById("objectCount").value;
 	this.numPoints = this.numPointsSqrt * this.numPointsSqrt;
-
-	this.velFB;
-	this.posFB;
 
 	this.zoomFactor = 1.0;
 	
@@ -32,6 +29,7 @@ function View() {
 	this.isUpdatingPositions = true;
 	
 	this.scripts;
+	this.particles;
 }
 
 View.prototype.initView = function () {
@@ -53,13 +51,13 @@ View.prototype.initView = function () {
 }
 
 View.prototype.setupShadersAndObjects = function (thisClass) {	
+	thisClass.particles = new Particles(thisClass, thisClass.smokeTex);
+
 	thisClass.setupCanvas(thisClass.gl);
 	
-	thisClass.setupUpdateVelShader(thisClass.gl);
-	thisClass.setupUpdatePosShader(thisClass.gl);
-	thisClass.setupFBAndInitTextures(thisClass.gl);
-	thisClass.setupShowBillboardShader(thisClass.gl);
+	thisClass.particles.setup(thisClass.gl);
 	thisClass.setupPhongShader(thisClass.gl);
+	thisClass.loadModels(thisClass.gl);
 	
 	//startTicking();
 }
@@ -85,16 +83,8 @@ View.prototype.draw = function () {
     mat4.identity(mvMatrix);
     mat4.translate(mvMatrix, [0, 0, -3.5]);
 	
-    /*var quatY = quat4.fromAngleAxis(Math.PI/4, [1,0,0]);
-	var quatX = quat4.fromAngleAxis(0*this.rotYAngle, [0,1,0]);
-	var quatRes = quat4.multiply(quatX, quatY);
-	var rotMatrix = quat4.toMat4(quatRes);
-	mat4.multiply(mvMatrix, rotMatrix);*/
-    
-	//mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
-	
-	this.drawHouse();
-	this.drawParticles();
+	this.drawHouse(this.gl);
+	this.particles.draw(this.gl);
 }
 
 View.prototype.setupCanvas = function (gl) {
@@ -122,10 +112,10 @@ function startTicking() {
 }
 
 View.prototype.drawHouse = function (gl) {
-	this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
+	this.currentProgram = this.scripts.getProgram("phongShader").useProgram(gl);
 	
 	mvPushMatrix();
-		this.gl.disable(this.gl.BLEND);
+		gl.disable(gl.BLEND);
 		
 		var quatY = quat4.fromAngleAxis(Math.PI/4, [1,0,0]);
 		var quatX = quat4.fromAngleAxis(0*this.rotYAngle, [0,1,0]);
@@ -148,7 +138,7 @@ View.prototype.drawHouse = function (gl) {
 			mat4.translate(mvMatrix, [0.0,-.16,0.0]);
 			mat4.scale(mvMatrix, [3, 0.05, 3]);
 			this.cubeModel.texture = this.rightWallMortarTex.texture;
-			this.cubeModel.draw(this.gl);
+			this.cubeModel.draw(gl);
 		mvPopMatrix();
 		
 		mat4.scale(mvMatrix, [.001, .001, .001]);
@@ -160,153 +150,10 @@ View.prototype.drawHouse = function (gl) {
 			if (this.textures[i]) {
 				this.models[i].texture = this.textures[j].texture;	
 			}
-			this.models[i].draw(this.gl);
+			this.models[i].draw(gl);
 		}
-		this.gl.enable(this.gl.BLEND);
+		gl.enable(this.gl.BLEND);
 	mvPopMatrix();
-}
-
-View.prototype.drawParticles = function (gl) {
-	if (this.first) 
-    	this.drawInitialTextures(this.gl);
-    
-    var elapsedFromStart = (timeNow - startTime)*0.001;
-    
-    //Update velocities:
-    if(this.isUpdatingVelocities)
-    	this.updateVelocities(this.gl);
-    
-    //Update positions:
-    if(this.isUpdatingPositions)
-    	this.updatePositions(this.gl);
-	
-	mvPushMatrix();
-		var quatY = quat4.fromAngleAxis(Math.PI/4, [1,0,0]);
-		var quatX = quat4.fromAngleAxis(0*this.rotYAngle, [0,1,0]);
-		var quatRes = quat4.multiply(quatX, quatY);
-		var rotMatrix = quat4.toMat4(quatRes);
-		mat4.multiply(mvMatrix, rotMatrix);
-		
-		mat4.scale(mvMatrix, [this.zoomFactor, this.zoomFactor, this.zoomFactor]);
-		
-		mat4.translate(mvMatrix, [0.0,-1.0,-2.0]);
-		
-		var quatY = quat4.fromAngleAxis(0*Math.PI/4, [1,0,0]);
-		var quatX = quat4.fromAngleAxis(this.rotYAngle, [0,1,0]);
-		var quatRes = quat4.multiply(quatX, quatY);
-		var rotMatrix = quat4.toMat4(quatRes);
-		mat4.multiply(mvMatrix, rotMatrix);
-	
-		mat4.scale(mvMatrix, [0.5, 0.5, 0.5]);
-		//Draw on canvas:
-		this.drawBillboards(this.gl);
-		//this.updateVelocities(this.gl, true);
-		//this.updatePositions(this.gl, true);
-	mvPopMatrix();
-	
-	this.posFB.swap();
-	this.velFB.swap();
-}
-
-//Draw functions:
-View.prototype.drawBillboards = function (gl) {
-	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
-	
-	mvPushMatrix();
-	    mat4.translate(mvMatrix, [0, 0, 1]);		
-	    this.showParticlesModel.drawBillboards(gl, this.posFB.texBack, this.smokeTex.texture);
-    mvPopMatrix();
-}
-
-View.prototype.updateVelocities = function (gl, toCanvas) {
-	this.currentProgram = this.scripts.getProgram("updateVelParticleShader").useProgram(gl);
-    
-    gl.uniform1f(this.currentProgram.getUniform("timeUniform"), this.deltaTime);
-    gl.uniform2f(this.currentProgram.getUniform("mousePosUniform"), /*0.5,0.5*/3*mouseX/gl.viewportWidth - 1, mouseY*2/gl.viewportHeight - 1/*Math.cos(rotYAngle*1.7)*0.5 + 0.5, Math.sin(rotYAngle*1.7)*0.5 + 0.5*/);
-    gl.uniform1f(this.currentProgram.getUniform("mouseDownUniform"), mouseDown ? -1 : 1);  
-    
-	if (!toCanvas)
-		this.velFB.bind(gl, this.velFB.back);
-    this.FBparticlesModel.drawOnFBMulti(gl, this.velFB, this.velFB.texFront, this.posFB.texFront);
-	//this.velFB.unbind(gl);
-}
-
-View.prototype.updatePositions = function (gl, toCanvas) {
-	this.currentProgram = this.scripts.getProgram("updatePosParticleShader").useProgram(gl);
-    
-    gl.uniform1f(this.currentProgram.getUniform("timeUniform"), this.deltaTime);
-
-	if (!toCanvas)
-		this.posFB.bind(gl, this.posFB.back);
-    this.FBparticlesModel.drawOnFBMulti(gl, this.posFB, this.posFB.texFront, this.velFB.texFront);
-	//this.posFB.unbind(gl);
-}
-
-View.prototype.drawInitialTextures = function (gl) {
-	this.currentProgram = this.scripts.getProgram("initialParticleShader").useProgram(gl);
-	
-	//Initialize position texture:
-	//var elapsedFromStart = (timeNow - startTime)*0.001;
-	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -0.5, -0.5);
-	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 1.0);
-	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
-	
-	this.posFB.bind(gl, this.posFB.back);
-	this.FBparticlesModel.drawOnFB(gl, this.posFB);
-	this.posFB.unbind(gl);
-	///
-
-	//Initialize velocity texture:
-	gl.uniform2f(this.currentProgram.getUniform("offsetUniform"), -.5 , -0.5);
-	gl.uniform1f(this.currentProgram.getUniform("multiplierUniform"), 0.1);
-	gl.uniform1f(this.currentProgram.getUniform("correctionUniform"), 0.45);
-
-	this.velFB.bind(gl, this.velFB.back);
-	this.FBparticlesModel.drawOnFB(gl, this.velFB);
-	this.velFB.unbind(gl);
-	
-	this.first = false;
-	this.posFB.swap();
-	this.velFB.swap();
-	
-}
-
-//Setup functions:
-View.prototype.setupShowBillboardShader = function (gl) {
-	this.currentProgram = this.scripts.getProgram("showBillboardShader").useProgram(gl);
-	
-	gl.uniform1i(this.currentProgram.getUniform("posUniform"), 0);
-	gl.uniform1i(this.currentProgram.getUniform("billUniform"), 1);
-	
-	this.setMVMatrixUniforms(gl);
-	this.setPMatrixUniform(gl);
-	
-	this.showParticlesModel = new GLShowParticles(gl, 2, this);
-	this.showParticlesModel.generateParticlesAndBuffer(gl, this.numPointsSqrt);
-}
-
-View.prototype.setupUpdatePosShader = function (gl) {
-	this.currentProgram = this.scripts.getProgram("updatePosParticleShader").useProgram(gl);
-	
-	gl.uniform1i(this.currentProgram.getUniform("currentPosUniform"), 0);
-	gl.uniform1i(this.currentProgram.getUniform("currentVelUniform"), 1);
-	
-	gl.activeTexture(gl.TEXTURE0);
-}
-
-View.prototype.setupUpdateVelShader = function (gl) {
-	this.currentProgram = this.scripts.getProgram("updateVelParticleShader").useProgram(gl);
-	
-	gl.uniform1i(this.currentProgram.getUniform("currentVelUniform"), 0);
-	gl.uniform1i(this.currentProgram.getUniform("currentPosUniform"), 1);
-}
-
-View.prototype.setupFBAndInitTextures = function (gl) {
-	this.FBparticlesModel = new GLFBParticles(gl, 1, this);
-	this.FBparticlesModel.createQuadAndSetup(gl);
-	
-	this.velFB = new FBO(gl, this.numPointsSqrt);
-	this.posFB = new FBO(gl, this.numPointsSqrt);
 }
 
 View.prototype.setupPhongShader = function (gl) {
@@ -315,7 +162,24 @@ View.prototype.setupPhongShader = function (gl) {
 	this.setMVMatrixUniforms(gl);
 	this.setPMatrixUniform(gl);
 	this.setNormalUniforms(gl); 
-	
+}
+
+View.prototype.setPMatrixUniform = function (gl) {
+	gl.uniformMatrix4fv(this.currentProgram.getUniform("pMatrixUniform"), false, pMatrix);
+}
+
+View.prototype.setMVMatrixUniforms = function (gl) {
+    gl.uniformMatrix4fv(this.currentProgram.getUniform("mVMatrixUniform"), false, mvMatrix);
+}
+
+View.prototype.setNormalUniforms = function (gl) {   
+    var normalMatrix = mat3.create();
+    mat4.toInverseMat3(mvMatrix, normalMatrix);
+    mat3.transpose(normalMatrix);
+    gl.uniformMatrix3fv(this.currentProgram.getUniform("nMatrixUniform"), false, normalMatrix);
+}
+
+View.prototype.loadModels = function (gl) {
 	this.cubeModel = new GLObject(gl, this);
 	
 	this.door = new GLObject(gl, this);
@@ -360,21 +224,6 @@ View.prototype.setupPhongShader = function (gl) {
 	//loadMesh(gl, this.windows, "/ParticleSystem/ParticleSystem/Resources/x-models/windows.ctm", objectLoader);
 	
 	loadMesh(gl, this.cubeModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
-}
-
-View.prototype.setPMatrixUniform = function (gl) {
-	gl.uniformMatrix4fv(this.currentProgram.getUniform("pMatrixUniform"), false, pMatrix);
-}
-
-View.prototype.setMVMatrixUniforms = function (gl) {
-    gl.uniformMatrix4fv(this.currentProgram.getUniform("mVMatrixUniform"), false, mvMatrix);
-}
-
-View.prototype.setNormalUniforms = function (gl) {   
-    var normalMatrix = mat3.create();
-    mat4.toInverseMat3(mvMatrix, normalMatrix);
-    mat3.transpose(normalMatrix);
-    gl.uniformMatrix3fv(this.currentProgram.getUniform("nMatrixUniform"), false, normalMatrix);
 }
 
 View.prototype.loadTextures = function(thisClass) {

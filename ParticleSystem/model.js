@@ -17,8 +17,8 @@ function submit () {
 	var count = document.getElementById("objectCount").value;
 	view.numPointsSqrt = count;
 	view.numPoints = count*count;
-	view.setupFBAndInitTextures(view.gl);
-	view.setupShowBillboardShader (view.gl);
+	view.particles.setupFBAndInitTextures(view.gl);
+	view.particles.setupShowBillboardShader(view.gl);
 	view.first = true;
 }
 

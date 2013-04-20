@@ -91,10 +91,10 @@ GLObject.prototype.draw = function (gl) {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	
-	//if (currentTexture != this.texture)		//Optimizes by not binding the texture, if the same texture is already bound.
+	//if (this.view.currentTexture != this.texture)		//Optimizes by not binding the texture, if the same texture is already bound.
 		this.bindTexture(gl);
 	
-	//if (this.identifier != lastGLObject) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
+	if (this.identifier != this.view.lastGLObject) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
 		this.bindBuffers(gl);
 		
 	this.view.setNormalUniforms(gl); 
