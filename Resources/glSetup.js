@@ -1,7 +1,9 @@
 "use strict";
 
-var mvMatrix = mat4.create();
-var mvMatrixStack = [];
+var mMatrix = mat4.create();
+var vMatrix = mat4.create();
+var vLMatrix = mat4.create();
+var mMatrixStack = [];
 var pMatrix = mat4.create();
 
 var frames = 0;
@@ -47,13 +49,13 @@ function initGL(canvas) {
 
 function mvPushMatrix() {
     var copy = mat4.create();
-    mat4.set(mvMatrix, copy);
-    mvMatrixStack.push(copy);
+    mat4.set(mMatrix, copy);
+    mMatrixStack.push(copy);
 }
 
 function mvPopMatrix() {
-    if (mvMatrixStack.length == 0) {
+    if (mMatrixStack.length == 0) {
       throw "Invalid popMatrix!";
     }
-    mvMatrix = mvMatrixStack.pop();
+    mMatrix = mMatrixStack.pop();
 }

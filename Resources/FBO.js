@@ -1,6 +1,6 @@
 "use strict";
 
-function FBO (gl, width) {
+function FBO (gl, width, includeDepth) {
 	this.widthFB = width;
 	this.heightFB = width;
 	
@@ -8,12 +8,34 @@ function FBO (gl, width) {
 	this.texBack = this.createAndSetupTexture (gl);
 	this.bindFBAndAttachTex(gl, this.buffer1, this.texBack);
 	
-	this.buffer2 = gl.createFramebuffer();
-	this.texFront = this.createAndSetupTexture (gl);
-	this.bindFBAndAttachTex(gl, this.buffer2, this.texFront);
+	if (includeDepth) {
+		this.texDepth = this.bindFBAndAttachDepthTex(gl, this.buffer1);
+	}
+	else {
+		this.buffer2 = gl.createFramebuffer();
+		this.texFront = this.createAndSetupTexture (gl);
+		this.bindFBAndAttachTex(gl, this.buffer2, this.texFront);
+	}
 	
 	this.front = this.buffer1;
 	this.back = this.buffer2;
+}
+
+FBO.prototype.bindFBAndAttachDepthTex = function (gl, buffer) {
+	gl.bindFramebuffer(gl.FRAMEBUFFER, buffer);
+	var depthTexture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, depthTexture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, this.widthFB, this.heightFB, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
+	
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
+	
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	
+	return depthTexture;
 }
 
 FBO.prototype.bindFBAndAttachTex = function (gl, buffer, tex) {

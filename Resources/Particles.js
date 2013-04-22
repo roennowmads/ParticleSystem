@@ -31,19 +31,19 @@ Particles.prototype.draw = function (gl) {
 		var quatX = quat4.fromAngleAxis(0*this.view.rotYAngle, [0,1,0]);
 		var quatRes = quat4.multiply(quatX, quatY);
 		var rotMatrix = quat4.toMat4(quatRes);
-		mat4.multiply(mvMatrix, rotMatrix);
+		mat4.multiply(mMatrix, rotMatrix);
 		
-		mat4.scale(mvMatrix, [this.view.zoomFactor, this.view.zoomFactor, this.view.zoomFactor]);
+		mat4.scale(mMatrix, [this.view.zoomFactor, this.view.zoomFactor, this.view.zoomFactor]);
 		
-		mat4.translate(mvMatrix, [0.0,-1.0,-2.0]);
+		mat4.translate(mMatrix, [0.0,-1.0,-2.0]);
 		
 		var quatY = quat4.fromAngleAxis(0*Math.PI/4, [1,0,0]);
 		var quatX = quat4.fromAngleAxis(this.view.rotYAngle, [0,1,0]);
 		var quatRes = quat4.multiply(quatX, quatY);
 		var rotMatrix = quat4.toMat4(quatRes);
-		mat4.multiply(mvMatrix, rotMatrix);
+		mat4.multiply(mMatrix, rotMatrix);
 	
-		mat4.scale(mvMatrix, [0.5, 0.5, 0.5]);
+		mat4.scale(mMatrix, [0.5, 0.5, 0.5]);
 		//Draw on canvas:
 		this.drawBillboards(gl);
 		//this.updateVelocities(this.gl, true);
@@ -66,7 +66,7 @@ Particles.prototype.drawBillboards = function (gl) {
 	this.view.currentProgram = this.view.scripts.getProgram("showBillboardShader").useProgram(gl);
 	
 	mvPushMatrix();
-	    mat4.translate(mvMatrix, [0, 0, 1]);		
+	    mat4.translate(mMatrix, [0, 0, 1]);		
 	    this.showParticlesModel.drawBillboards(gl, this.posFB.texBack, this.texture.texture);
     mvPopMatrix();
 }
