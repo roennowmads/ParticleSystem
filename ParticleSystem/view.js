@@ -59,6 +59,10 @@ View.prototype.initView = function () {
 }
 
 View.prototype.setupShadersAndObjects = function (thisClass) {	
+	var prevText = document.getElementById("loadingFile");
+	if (prevText)
+		canvasDiv.removeChild(prevText);
+
 	thisClass.particles = new Particles(thisClass, thisClass.smokeTex, true);
 	thisClass.particles2 = new Particles(thisClass, thisClass.house.textures[0], false);
 	thisClass.shadowFBinit(thisClass.gl);
@@ -119,8 +123,6 @@ View.prototype.draw = function () {
 	
 	//this.currentProgram = this.scripts.getProgram("phongShader").useProgram(this.gl);
 	this.currentProgram = this.scripts.getProgram("phongShadowShader").useProgram(this.gl);
-	
-	//this.gl.uniformMatrix4fv(this.currentProgram.getUniform("mVLMatrixUniform"), false, this.mvLMatrix);
 	
 	this.shadowFB.unbind(this.gl);
 	this.gl.viewport(0, 0, this.gl.viewportWidth, this.gl.viewportHeight);
@@ -304,8 +306,11 @@ View.prototype.loadModels = function (gl) {
 	this.groundModel = new GLObject(gl, this);
 	
 	var objectLoader = new FileLoader(13, startTicking, this); 
+	
+	displayLoadState ("Loading models");
+	
 	this.house.loadModels(gl, objectLoader);
-	loadMesh(gl, this.groundModel, "/ParticleSystem/ParticleSystem/Resources/x-models/cube1.ctm", objectLoader);
+	loadMesh(gl, this.groundModel, "/ParticleSystem/ParticleSystem/Resources/x-models/ground.ctm", objectLoader);
 }
 
 View.prototype.loadTextures = function(thisClass) {
@@ -314,8 +319,10 @@ View.prototype.loadTextures = function(thisClass) {
 	thisClass.groundTex = new Texture();
 	
 	var objectLoader = new FileLoader(13, thisClass.setupShadersAndObjects, thisClass); 
+	
+	displayLoadState ("Loading textures");
+	
 	thisClass.house.loadTextures(thisClass.gl, objectLoader);
 	loadImageToTex(thisClass.gl, thisClass.groundTex, "/ParticleSystem/ParticleSystem/Resources/x-images/House/Mortar_color.jpg", objectLoader);
-	//loadImageToTex(thisClass.gl, thisClass.cubeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/red.png", objectLoader, true);
 	loadImageToTex(thisClass.gl, thisClass.smokeTex, "/ParticleSystem/ParticleSystem/Resources/x-images/smoke.png", objectLoader, true);
 }

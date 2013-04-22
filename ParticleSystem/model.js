@@ -63,6 +63,7 @@ function loadImageToTex (gl, textureObj, imgLoc, objectLoader, notMipmap) {
 	var img = new Image();
 	img.src = imgLoc;
 	img.onload = function () {
+		displayLoadState ("Loaded texture: " + imgLoc);
 		textureObj.texture = new createTexture(img, gl, objectLoader, notMipmap);
 	}
 }
@@ -199,4 +200,19 @@ function fullscreenChange () {
 		view.initView();
 	}
 	view.gl.viewport(0, 0, view.canvas.width, view.canvas.height);
+}
+
+function displayLoadState (state) {
+	var canvasDiv = document.getElementById("canvasDiv");
+	var prevText = document.getElementById("loadingFile");
+	if (prevText)
+		canvasDiv.removeChild(prevText);
+		
+	var text = document.createElement("p");
+	text.id = "loadingFile";
+	text.style.position = "absolute";
+	text.style.left = "300px";
+	text.innerHTML = state
+	
+	canvasDiv.appendChild(text);
 }

@@ -14,7 +14,6 @@ uniform mat4 uVLMatrix;
 uniform mat4 uMMatrix;
 uniform mat4 uVMatrix;
 
-//uniform mat4 uMVMatrix;
 uniform mat4 uPMatrix;
 uniform mat3 uNMatrix;
 
