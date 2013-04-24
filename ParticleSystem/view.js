@@ -45,7 +45,7 @@ View.prototype.initView = function () {
 	
 	var depth_texture_ext = this.gl.getExtension('WEBGL_depth_texture');
 	if (!depth_texture_ext)
-		alert("WEBGL_texture_depth extension is not available!");
+		alert("WEBGL_depth_texture extension is not available!");
 		
 	//Create shader programs:
 	this.scripts = new ShaderScriptLoader(this.gl, this.loadTextures, this);
