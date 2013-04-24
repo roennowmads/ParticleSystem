@@ -14,6 +14,7 @@ varying vec4 vVL;
 void main(void) {
 	vec3 lightWeighting;
 
+	//Phong shading:
 	lightWeighting = vec3(1.0, 1.0, 1.0);
 	float specularLightWeighting = 0.0;
 	vec3 lightDirection = normalize(vLightingPosition);
@@ -31,14 +32,18 @@ void main(void) {
 	float directionalLightWeighting = max(NdotL, 0.0);
 	lightWeighting = directionalLightWeighting + uLightingColor * specularLightWeighting;
 	
-	vec3 depth = vVL.xyz / vVL.w;
-	float depthMapDepth = texture2D(uDepthMap, depth.xy).x;
-	depth.z *= 0.999;
+	//Determine if the point is in shadow:
+	vec3 projectedDepth = vVL.xyz / vVL.w;
+	float depthMapDepth = texture2D(uDepthMap, projectedDepth.xy).x;
 	
-	vec4 textureColor = texture2D(uTexture, vTextureCoord);
+	//"Cure" shadow acne:
+	projectedDepth.z *= 0.999;
 	
-	if (depthMapDepth < depth.z)
+	//If the distance to the camera from this fragment is larger than the distance recorded in the depth map, then in shadow:
+	if (depthMapDepth < projectedDepth.z)
 		lightWeighting *= 0.5;
 	
+	
+	vec4 textureColor = texture2D(uTexture, vTextureCoord);
 	gl_FragColor = vec4(textureColor.rgb * lightWeighting, textureColor.a);
 }

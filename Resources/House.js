@@ -17,6 +17,18 @@ House.prototype.draw = function (gl) {
 	}
 }
 
+House.prototype.drawDepth = function (gl) {
+	for (var i = 0; i < this.models.length; i++) {
+		var j = i;
+		if (i > 6)
+			j--;
+		if (this.textures[i]) {
+			this.models[i].texture = this.textures[j].texture;	
+		}
+		this.models[i].drawDepth(gl);
+	}
+}
+
 House.prototype.loadTextures = function (gl, objectLoader) {
 	var leftWallTex = new Texture();
 	var frontWallTex = new Texture();

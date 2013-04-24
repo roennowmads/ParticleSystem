@@ -56,6 +56,10 @@
 			top: 5px; 
 			left: 5px;
 		}
+		#partCount {
+			color: rgb(150, 150, 150);
+			padding-left: 5px; 
+		}
 		
     </style>
     <script type="text/javascript" language="javascript" src="Resources/libs/webgl-debug.js"></script>
@@ -83,16 +87,17 @@
     		<h2>Instructions:</h2>
 			<p>Move mouse pointer around the canvas to move the point of gravity</p>
 			<p>Hold down a mouse button to switch to anti-gravity</p>
-			<p>When position update is paused use arrow keys to zoom and rotate the view.</p>
 			<div style="padding-bottom: 10px;">
 			</div>
 		</div>
 		<div class="sidebar">	
     		<h2>Options:</h2>
 			<div style="padding-bottom: 10px;">
-				<label for="objectCount">The square root of the number of particles (should be power of 2):</label>
-				<input style="text-align:right; width:70px" type="text" id="objectCount" value="128" maxlength="10" />
-				<button id="goButton">Go</button>
+				<label for="objectCount">Set the number of particles (the square root, should be power of 2):</label>
+				<div style="padding-left: 5px; padding-top: 10px;">
+					<input style="text-align:right; width:70px" type="text" id="objectCount" value="128" maxlength="10" onchange="submit()" />
+					<label id="partCount" for="objectCount"></label>
+				</div>
 			</div>
 			<div>
 				<input type="checkbox" id="velInput" name="velInput" value="velInput" onchange="toggleVelocities()" checked>
@@ -103,10 +108,31 @@
 				<label for="posInput">Update positions (or press z)</label>
 			</div>
 			<div style="padding-bottom: 10px;">
-				If positions are not being updated, use arrow keys to rotate and zoom. 
+				<label for="pointSize">Set particle size:</label>
+				<input style="text-align:right; width:30px" type="text" id="pointSize" value="1" maxlength="3" onchange="updatePointSize()"/>
 			</div>
 			<div style="padding-bottom: 10px;">
 				<button id="fullscreen">Fullscreen</button>
+			</div>
+			<div style="padding-bottom: 10px;">
+				<input type="checkbox" id="drawDepth" name="drawDepth" value="drawDepth" onchange="toggleDrawDepth()">
+				<label for="drawDepth">Draw depth map</label>
+			</div>
+			<div style="padding-bottom: 10px;">
+				<input type="checkbox" id="drawShadows" name="drawShadows" value="drawShadows" onchange="toggleDrawShadows()" checked>
+				<label for="drawShadows">Animate shadow</label>
+			</div> 
+			<div style="padding-bottom: 10px;">
+				<input type="checkbox" id="drawVel" name="drawVel" value="drawVel" onchange="toggleDrawVel()">
+				<label for="drawVel">Draw positions map</label>
+			</div>
+			<div style="padding-bottom: 10px;">
+				<input type="checkbox" id="drawBloom" name="drawBloom" value="drawBloom" onchange="toggleDrawBloom()">
+				<label for="drawBloom">Activate blooming</label>
+			</div>
+			<div style="padding-bottom: 10px;">
+				<input type="checkbox" id="rotate" name="rotate" value="rotate" onchange="toggleRotate()">
+				<label for="rotate">Rotate</label>
 			</div>
 		</div>
     </div>

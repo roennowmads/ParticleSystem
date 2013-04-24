@@ -12,18 +12,14 @@ void main(void) {
 	vec3 current = vec3(texture2D(uCurrentVel, vTexCoords));
 
 	vec3 accelPoint = vec3(texture2D(uCurrentPos, vTexCoords));
-	vec3 deltaDir = normalize(vec3(uMousePos, 0.0) - accelPoint) + vec3(cos(gl_FragCoord.y)*7.0, /*cos(gl_FragCoord.y)*7.0*/ 0.0, 0.0)*0.1;
 	
-	/*vec3 attract1 = normalize(vec3(0.0, 0.0, 0.0) - accelPoint);
-	attract1 = normalize(attract1 + deltaDir);*/
+	//The mouse's y position is used as the z component to make the particles move in the horizontal plane:
+	vec3 deltaDir = normalize(vec3(uMousePos.x, 2.0, uMousePos.y) - accelPoint);
 	
 	//Toggle anti-gravity if mouse button is pressed.
 	deltaDir = uMouseDown*deltaDir;
 
-	vec3 new = current + deltaDir*.03*uTime;
-	
-	//Drag;
-	//new -= new*0.01;
+	vec3 new = current + deltaDir*.06;
 
 	vec3 dir = normalize(new);
 	float len = length(new);

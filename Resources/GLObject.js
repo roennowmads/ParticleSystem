@@ -19,7 +19,7 @@ GLObject.prototype.loadMeshFromCTMFile = function (file, gl, fileLoader) {
 	request.onreadystatechange = function () { 
 		if (request.readyState == 4) { 
 		
-			displayLoadState ("Loaded model: " + file);
+			displayLoadState ("Downloaded model: " + file);
 		
 			glObject.handleLoadedCTMFile(request.responseText, gl, fileLoader);
 		}
@@ -29,13 +29,7 @@ GLObject.prototype.loadMeshFromCTMFile = function (file, gl, fileLoader) {
 }
 
 GLObject.prototype.handleLoadedCTMFile = function (resp, gl, fileLoader) {
-	//var ctmWorker = new Worker("../Resources/ctmworker.js")
 	var glObject = this;
-	
-	/*ctmWorker.onmessage = function (e) {
-		glObject.bufferCTMMesh(e.data, gl, fileLoader);
-	};
-	ctmWorker.postMessage(resp);*/
 	
 	var data = new CTM.File( new CTM.Stream(resp));
 	glObject.bufferCTMMesh(data, gl, fileLoader);
@@ -90,14 +84,17 @@ GLObject.prototype.bindBuffers = function (gl) {
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
 }
 
-GLObject.prototype.draw = function (gl) {	
-	//gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	//gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-	
+GLObject.prototype.bindBuffersDepth = function (gl) {
+	gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+	gl.vertexAttribPointer(this.view.currentProgram.getAttribute("vertexPositionAttribute"), 3, gl.FLOAT, false, 0, 0);
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.vertexIndexBuffer);
+}
+
+GLObject.prototype.draw = function (gl) {		
 	//if (this.view.currentTexture != this.texture)		//Optimizes by not binding the texture, if the same texture is already bound.
 		this.bindTexture(gl);
 	
-	if (this.identifier != this.view.lastGLObject) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
+	//if (this.identifier != this.view.lastGLObject) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
 		this.bindBuffers(gl);
 		
 	this.view.setNormalUniforms(gl); 
@@ -107,28 +104,12 @@ GLObject.prototype.draw = function (gl) {
 	this.view.lastGLObject = this.identifier;
 }
 
-//Helper functions:
-function Texture () {
-	this.texture;
-}
-
-function createTexture (img, gl, fileLoader, notMipmap) {
-	var texture = gl.createTexture();	
-	gl.bindTexture(gl.TEXTURE_2D, texture);
+GLObject.prototype.drawDepth = function (gl) {		
+	//if (this.identifier != this.view.lastGLObject) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
+		this.bindBuffersDepth(gl);
+		
+	gl.uniformMatrix4fv(view.currentProgram.getUniform("mMatrixUniform"), false, mMatrix);
+	gl.drawElements(gl.TRIANGLES, this.indexNumItems, gl.UNSIGNED_SHORT, 0);
 	
-	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	if (!notMipmap) {
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-		gl.generateMipmap(gl.TEXTURE_2D);
-	}
-	else
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-	
-	gl.bindTexture(gl.TEXTURE_2D, null);
-	
-	fileLoader.count();
-	
-	return texture;
+	this.view.lastGLObject = this.identifier;
 }

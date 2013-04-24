@@ -47,8 +47,8 @@ GLShowParticles.prototype.drawBillboards = function (gl, posTex, billboardTex) {
 	//if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.CANVAS) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
 		this.bindBuffers(gl);
 
-	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+	//gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	//gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
 	
 	//Bind texture to read vertex positions from:
 	gl.activeTexture(gl.TEXTURE0);

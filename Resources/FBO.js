@@ -1,20 +1,21 @@
 "use strict";
 
-function FBO (gl, width, includeDepth) {
+function FBO (gl, width, includeDepth, linearFiltering) {
 	this.widthFB = width;
 	this.heightFB = width;
 	
 	this.buffer1 = gl.createFramebuffer();
-	this.texBack = this.createAndSetupTexture (gl);
-	this.bindFBAndAttachTex(gl, this.buffer1, this.texBack);
+	this.texFront = this.createAndSetupTexture (gl, linearFiltering);
+	this.bindFBAndAttachTex(gl, this.buffer1, this.texFront);
 	
+	//In the cases where depth is needed, double buffering is not needed, so do not create a second buffer:
 	if (includeDepth) {
 		this.texDepth = this.bindFBAndAttachDepthTex(gl, this.buffer1);
 	}
 	else {
 		this.buffer2 = gl.createFramebuffer();
-		this.texFront = this.createAndSetupTexture (gl);
-		this.bindFBAndAttachTex(gl, this.buffer2, this.texFront);
+		this.texBack = this.createAndSetupTexture (gl, linearFiltering);
+		this.bindFBAndAttachTex(gl, this.buffer2, this.texBack);
 	}
 	
 	this.front = this.buffer1;
@@ -58,18 +59,22 @@ FBO.prototype.swap = function (gl) {
 	this.back = temp;
 }
 
-FBO.prototype.createAndSetupTexture = function (gl) {
+FBO.prototype.createAndSetupTexture = function (gl, linearFiltering) {
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	
 	gl.pixelStorei(gl.PACK_ALIGNMENT, 1);
 	gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-	// Set up texture so we can render any size image and so we are
-	// working with pixels.
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	if (linearFiltering) {
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	}
+	else {
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	}
 	
 	// make the texture the same size as the image
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, this.widthFB, this.heightFB, 0, gl.RGB, gl.FLOAT, null);

@@ -13,18 +13,7 @@ var view;
 var origWidth;
 var origHeight;
 
-function submit () {
-	var count = document.getElementById("objectCount").value;
-	view.numPointsSqrt = count;
-	view.numPoints = count*count;
-	view.particles.setupFBAndInitTextures(view.gl);
-	view.particles.setupShowBillboardShader(view.gl);
-	view.particles.first = true;
-}
-
 function main () {
-	view = new View();
-
 	document.onmousemove = onMouseMove;
 	document.onmousewheel = onMouseWheel;
 	document.onkeydown = onKeyDown;
@@ -42,8 +31,9 @@ function main () {
 	document.addEventListener("mozfullscreenchange", fullscreenChange, false)
 	document.getElementById("fullscreen").onclick = onFullscreenClick;
 	
+	view = new View();
 	document.getElementById("objectCount").value = view.numPointsSqrt; 
-	document.getElementById("goButton").onclick = submit;
+	document.getElementById("partCount").innerHTML = "Count: " + view.numPoints;
 	
 	//Initialize mouse position to the middle of the canvas:
 	mouseX = canvasElm.width/2;
@@ -55,6 +45,16 @@ function main () {
 	view.initView();
 }
 
+function submit () {
+	var count = document.getElementById("objectCount").value;
+	view.numPointsSqrt = count;
+	view.numPoints = count*count;
+	view.particles.setupFBAndInitTextures(view.gl);
+	view.particles.setupShowBillboardShader(view.gl);
+	view.particles.first = true;
+	document.getElementById("partCount").innerHTML = "Count: " + view.numPoints;
+}
+
 function loadMesh (gl, model, meshLoc, objectLoader) {
 	model.loadMeshFromCTMFile(meshLoc, gl, objectLoader);
 }
@@ -63,7 +63,7 @@ function loadImageToTex (gl, textureObj, imgLoc, objectLoader, notMipmap) {
 	var img = new Image();
 	img.src = imgLoc;
 	img.onload = function () {
-		displayLoadState ("Loaded texture: " + imgLoc);
+		displayLoadState ("Downloaded texture: " + imgLoc);
 		textureObj.texture = new createTexture(img, gl, objectLoader, notMipmap);
 	}
 }
@@ -134,8 +134,8 @@ function onMouseMove(e) {
 			}
 		}
 		else {
-			mouseX = e.offsetX;//clientX;//e.movementX || e.webkitMovementX || e.mozMovementX || 0;
-			mouseY = e.offsetY;//clientY;//e.movementY || e.webkitMovementY || e.mozMovementX || 0;
+			mouseX = e.offsetX;
+			mouseY = e.offsetY;
 		}
 	}
 }
@@ -151,18 +151,6 @@ function onMouseWheel(e) {
 	}
 	e.preventDefault();
 	
-}
-
-function toggleVelocities () {
-	var velInput = document.getElementById("velInput");
-	view.isUpdatingVelocities = velInput.checked;
-}
-
-function togglePositions () {
-	var posInput = document.getElementById("posInput");
-	view.isUpdatingPositions = posInput.checked;
-	view.zoomFactor = 1.0;
-	view.rotYAngle = 0.0;
 }
 
 function FileLoader (fileCount, onCompleteFunction, originClass) {
@@ -215,4 +203,66 @@ function displayLoadState (state) {
 	text.innerHTML = state
 	
 	canvasDiv.appendChild(text);
+}
+
+function Texture () {
+	this.texture;
+}
+
+function createTexture (img, gl, fileLoader, notMipmap) {
+	var texture = gl.createTexture();	
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	if (!notMipmap) {
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+		gl.generateMipmap(gl.TEXTURE_2D);
+	}
+	else
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	
+	gl.bindTexture(gl.TEXTURE_2D, null);
+	
+	fileLoader.count();
+	
+	return texture;
+}
+
+function toggleVelocities () {
+	var velInput = document.getElementById("velInput");
+	view.isUpdatingVelocities = velInput.checked;
+}
+
+function togglePositions () {
+	var posInput = document.getElementById("posInput");
+	view.isUpdatingPositions = posInput.checked;
+	view.zoomFactor = 1.0;
+	view.rotYAngle = 0.0;
+}
+
+function updatePointSize () {
+	view.pointSize = document.getElementById("pointSize").value;
+}
+
+function toggleDrawDepth () {
+	view.drawDepth = !view.drawDepth;
+}
+
+function toggleDrawVel () {
+	view.drawPositions = !view.drawPositions;
+}
+
+function toggleDrawBloom () {
+	view.drawBloom = !view.drawBloom;
+}
+
+function toggleDrawShadows () {
+	view.drawShadows = !view.drawShadows;
+}
+
+function toggleRotate () {
+	view.rotateCounter = 0;
+	view.isRotating = !view.isRotating;
 }

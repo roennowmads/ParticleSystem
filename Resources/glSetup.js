@@ -2,7 +2,7 @@
 
 var mMatrix = mat4.create();
 var vMatrix = mat4.create();
-var vLMatrix = mat4.create();
+var lightVMatrix = mat4.create();
 var mMatrixStack = [];
 var pMatrix = mat4.create();
 
@@ -13,9 +13,6 @@ var fps = 0;
 
 var FPSSum = 0;
 var FPSsamplesNum = 0;
-
-var fragmentScript = null;
-//var vertexScript = null;
 
 function logFrameRate() {
 	frames++;

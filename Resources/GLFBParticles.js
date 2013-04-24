@@ -52,38 +52,34 @@ GLFBParticles.prototype.bindBuffers = function (gl) {
 }
 
 GLFBParticles.prototype.drawOnFB = function (gl, FBO) {
-	//FBO.bind(gl);
-	
 	gl.viewport(0, 0, FBO.widthFB, FBO.heightFB);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    
-    //if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.FRAMEBUFFER)
-    	this.bindBuffers(gl);
+	
+    this.bindBuffers(gl);
     
     gl.drawArrays(gl.TRIANGLES, 0, this.indexNumItems);
+}
+
+GLFBParticles.prototype.drawOnFBOne = function (gl, FBO, texture) {
+	gl.viewport(0, 0, FBO.widthFB, FBO.heightFB);
     
-    //lastGLObject = this.identifier;
-    //lastDrawTarget = DRAWTARGETS.FRAMEBUFFER;
+    this.bindBuffers(gl);
+		
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+    
+    gl.drawArrays(gl.TRIANGLES, 0, this.indexNumItems);
 }
 
 GLFBParticles.prototype.drawOnFBMulti = function (gl, FBO, texCurrent, texDelta) {
-	//FBO.bind(gl);
-	
 	gl.viewport(0, 0, FBO.widthFB, FBO.heightFB);
     
-	//if (this.identifier != lastGLObject && lastDrawTarget != DRAWTARGETS.FRAMEBUFFER)
-		this.bindBuffers(gl);
+	this.bindBuffers(gl);
 		
 	gl.activeTexture(gl.TEXTURE0);
 	gl.bindTexture(gl.TEXTURE_2D, texCurrent);
 	
 	gl.activeTexture(gl.TEXTURE1);
 	gl.bindTexture(gl.TEXTURE_2D, texDelta);
-	
-	//gl.activeTexture(gl.TEXTURE0);
     
     gl.drawArrays(gl.TRIANGLES, 0, this.indexNumItems);
-    
-    //lastGLObject = this.identifier;
-    //lastDrawTarget = DRAWTARGETS.FRAMEBUFFER;
 }
