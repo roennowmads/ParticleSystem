@@ -33,14 +33,18 @@ void main(void) {
 	lightWeighting = directionalLightWeighting + uLightingColor * specularLightWeighting;
 	
 	//Determine if the point is in shadow:
-	vec3 projectedDepth = vVL.xyz / vVL.w;
-	float depthMapDepth = texture2D(uDepthMap, projectedDepth.xy).x;
+	vec3 projectedDepth = vVL.xyz;
+	
+	//Use texture2DProj to project the texture by dividing by the 4th component. Since we cannot use the result of the division, 
+	//we have to multiply by the 4th component in the following depth comparison.
+	float depthMapDepth = texture2DProj(uDepthMap, vVL).x;
 	
 	//"Cure" shadow acne:
 	projectedDepth.z *= 0.999;
 	
 	//If the distance to the camera from this fragment is larger than the distance recorded in the depth map, then in shadow:
-	if (depthMapDepth < projectedDepth.z)
+	//The multiplication unprojects the depth map, and is done to avoid a division by the 4th component earlier in the code.
+	if (depthMapDepth * vVL.w < projectedDepth.z)
 		lightWeighting *= 0.5;
 	
 	

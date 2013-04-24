@@ -135,14 +135,13 @@ View.prototype.draw = function () {
 			var rotMatrix = quat4.toMat4(quatY);
 			mat4.multiply(vMatrix, rotMatrix);
 		}
-		gl.uniformMatrix4fv(this.currentProgram.getUniform("lightVMatrixUniform"), false, lightVMatrix);
 		
 		if (this.drawBloom) {
 			//Render the scene into a texture:
 			this.sceneFB.bind(gl, this.sceneFB.front);
 			this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 			this.drawHouseAndGround(gl);
-			this.particles.draw(gl, this.sceneFB);
+			//this.particles.draw(gl, this.sceneFB);
 			
 			//Depth testing is unnecessary for 2D image rendering, so it is disabled:
 			gl.disable(gl.DEPTH_TEST);
@@ -213,7 +212,7 @@ function startTicking() {
 
 View.prototype.shadowFBinit = function (gl) {
 	//Create framebuffer with depth component:
-	this.shadowFB = new FBO(gl, 2048, true);
+	this.shadowFB = new FBO(gl, 4096, true);
 }
 View.prototype.sceneFBinit = function (gl) {
 	//Create framebuffer with depth component:
@@ -246,8 +245,6 @@ View.prototype.drawHouseAndGroundFromLight = function (gl) {
 		var quatRes = quat4.multiply(quatX, quatY);
 		var rotMatrix = quat4.toMat4(quatRes);
 		mat4.multiply(lightVMatrix, rotMatrix);
-		
-		gl.uniformMatrix4fv(this.currentProgram.getUniform("lightVMatrixUniform"), false, lightVMatrix);
 		
 		//Ground:
 		mvPushMatrix();
@@ -364,7 +361,20 @@ View.prototype.setPMatrixUniform = function (gl) {
 View.prototype.setMVMatrixUniforms = function (gl) {
     gl.uniformMatrix4fv(this.currentProgram.getUniform("mMatrixUniform"), false, mMatrix);
 	gl.uniformMatrix4fv(this.currentProgram.getUniform("vMatrixUniform"), false, vMatrix);
+}
+
+View.prototype.setShadowMatrixUniforms = function (gl) {
+	mvMatrix = mat4.multiply(vMatrix, mMatrix, mvMatrix);
+    gl.uniformMatrix4fv(this.currentProgram.getUniform("mVMatrixUniform"), false, mvMatrix);
 	
+	plmMatrix = mat4.multiply(pMatrix, mat4.multiply(lightVMatrix, mMatrix, plmMatrix), plmMatrix);
+	gl.uniformMatrix4fv(this.currentProgram.getUniform("pLMMatrixUniform"), false, plmMatrix);
+}
+
+View.prototype.setPMVMatrixUniforms = function (gl) {	
+	//Do the matrix projection on the CPU, instead of for every vertex on the GPU:
+	pmvMatrix = mat4.multiply(pMatrix, mat4.multiply(vMatrix, mMatrix, pmvMatrix), pmvMatrix)
+	gl.uniformMatrix4fv(this.currentProgram.getUniform("pMVMatrixUniform"), false, pmvMatrix);
 }
 
 View.prototype.setNormalUniforms = function (gl) {   

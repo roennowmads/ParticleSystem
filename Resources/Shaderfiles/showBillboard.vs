@@ -8,6 +8,8 @@ uniform mat4 uMMatrix;
 uniform mat4 uVMatrix;
 uniform mat4 uPMatrix;
 
+uniform mat4 uPMVMatrix;
+
 uniform float uPointSize;
 
 void main() {
@@ -16,6 +18,6 @@ void main() {
 
 	gl_PointSize = uPointSize;
 
-	gl_Position = uPMatrix * uVMatrix * uMMatrix * position;
+	gl_Position = uPMVMatrix * position;
 
 }

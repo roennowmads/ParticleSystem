@@ -1,9 +1,7 @@
 attribute vec3 aVertexPosition;
 
-uniform mat4 uMMatrix;
-uniform mat4 uLightVMatrix;
-uniform mat4 uPMatrix;
+uniform mat4 uPLMMatrix;
 
 void main(void) {
-	gl_Position = uPMatrix * uLightVMatrix * uMMatrix * vec4(aVertexPosition, 1.0);
+	gl_Position = uPLMMatrix * vec4(aVertexPosition, 1.0);
 }

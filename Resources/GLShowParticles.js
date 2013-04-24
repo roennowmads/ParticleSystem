@@ -59,6 +59,6 @@ GLShowParticles.prototype.drawBillboards = function (gl, posTex, billboardTex) {
 	
 	//gl.activeTexture(gl.TEXTURE0);
 	
-	this.view.setMVMatrixUniforms(gl);
+	this.view.setPMVMatrixUniforms(gl);
 	gl.drawArrays(gl.POINTS, 0, this.indexNumItems)
 }

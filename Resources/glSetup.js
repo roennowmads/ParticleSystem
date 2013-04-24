@@ -1,10 +1,13 @@
 "use strict";
 
+var plmMatrix = mat4.create();
+var mvMatrix = mat4.create();
 var mMatrix = mat4.create();
 var vMatrix = mat4.create();
 var lightVMatrix = mat4.create();
 var mMatrixStack = [];
 var pMatrix = mat4.create();
+var pmvMatrix = mat4.create();
 
 var frames = 0;
 var time = new Date().getTime();

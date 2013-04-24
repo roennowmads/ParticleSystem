@@ -98,7 +98,7 @@ GLObject.prototype.draw = function (gl) {
 		this.bindBuffers(gl);
 		
 	this.view.setNormalUniforms(gl); 
-	this.view.setMVMatrixUniforms(gl);
+	this.view.setShadowMatrixUniforms(gl);
 	gl.drawElements(gl.TRIANGLES, this.indexNumItems, gl.UNSIGNED_SHORT, 0);
 	
 	this.view.lastGLObject = this.identifier;
@@ -108,7 +108,7 @@ GLObject.prototype.drawDepth = function (gl) {
 	//if (this.identifier != this.view.lastGLObject) 		//Optimizes by not binding buffers again for subsequent instances of the same mesh.
 		this.bindBuffersDepth(gl);
 		
-	gl.uniformMatrix4fv(view.currentProgram.getUniform("mMatrixUniform"), false, mMatrix);
+	this.view.setShadowMatrixUniforms(gl);
 	gl.drawElements(gl.TRIANGLES, this.indexNumItems, gl.UNSIGNED_SHORT, 0);
 	
 	this.view.lastGLObject = this.identifier;
